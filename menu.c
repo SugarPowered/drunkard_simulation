@@ -1,30 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "menu.h"
 
-simulation init_simulation_parameters() {
-  simulation sim;
+#include <math.h>
 
-  printf("Zadaj x a y rozmery sveta: \n");
-  scanf(" %d %d", &sim.world_x, &sim.world_y);
-
-  printf("Zadaj pocet replikacii: \n");
-  scanf(" %d", &sim.replications);
+void input_direction_probability(simulation *sim) {
 
   printf("Zadaj pravdepodobnosti posunov chodca, \n");
   printf("v poradi: HORE, DOLE, VLAVO, VPRAVO \n");
-  scanf(" %lf %lf %lf %lf", &sim.probabilities[0], &sim.probabilities[1], &sim.probabilities[2], &sim.probabilities[3]);
-  //todo check if the sum is 1
+
+  double checksum = 0.0;
+  for (int i = 0; i < 4; i++) {
+    scanf("%lf", &sim->probabilities[i]);
+    checksum +=sim->probabilities[i];
+  }
+
+  if (round(checksum) == 1.0) { //todo upravit citlivost zaokruhlenia
+    printf("Pravdepodobnosti zaznamenane.\n");
+  } else {
+    printf("Suma pravdepodobnosti musi byt 1! Skus znova.\n");
+    input_direction_probability(sim);
+  }
+}
+
+void initialize_simulation(simulation *sim) {
+
+  printf("Zadaj x a y rozmery sveta: \n");
+  scanf(" %d %d", &sim->world_x, &sim->world_y);
+
+  printf("Zadaj pocet replikacii: \n");
+  scanf(" %d", &sim->replications);
+
+  input_direction_probability(sim);
 
   printf("Zadaj maximalny pocet krokov chodca: \n");
-  scanf( " %zu", &sim.max_steps);
+  scanf( " %zu", &sim->max_steps);
 
   printf("Zadaj meno subora, kde sa ulozi vysledok: \n");
-  scanf(" %99s", &sim.file_to_save);
+  scanf(" %99s", &sim->file_to_save);
 
-  //todo add interactive_world, obstacle_world, file_to_load
+  printf("Je svet interaktivny? (1 = ano, 0 = nie): \n");
+  scanf(" %d", &sim->interactive_world);
 
-  return sim;
+  printf("Obsahuje svet prekazky? (1 = ano, 0 = nie): \n");
+  scanf(" %d", &sim->obstacle_world);
+
+  printf("Zadaj meno subora na nacitanie sveta (alebo 'none'): \n");
+  sim->file_to_load = calloc(100, sizeof(char));
+  scanf(" %99s", sim->file_to_load);
+
 }
 
 void print_ascii_menu_screen() {
@@ -52,28 +77,52 @@ void print_ascii_menu_screen() {
   printf("[D] Koniec programu \n");
 }
 
-int main(int argc, char *argv[])
-{
+void start_interactive_mode(simulation *sim) {
+  printf("\nSpustam interaktivny mod...\n");
+  //todo draw_simulation(sim);
+  exit(0);
+}
+
+void start_summary_mode(simulation *sim) {
+  printf("\nSpustam sumarny mod...\n");
+  for (int i = 0; i < sim->replications; i++) {
+    //todo step_simulation(sim);
+  }
+  //todo save_to_file(sim, sim->file_to_save);
+  exit(0);
+}
+
+void menu() {
   char input;
 
-  print_ascii_menu_screen();
-  scanf(" %c", &input);
+  while (1) {
+    print_ascii_menu_screen();
+    scanf(" %c", &input);
 
-  if (input == 'A' || input == 'a') {
-    simulation sim = init_simulation_parameters();
-    /* simulation_init(
-     &sim.world_x, &sim.world_y, &sim.replications, &sim.probabilities,
-     &sim.max_steps, &sim.file_to_save,
-     bool interactive_world, bool obstacle_world, char *file_to_load);
-    */
+    if (input == 'A' || input == 'a') {
+      simulation sim;
+      initialize_simulation(&sim);
 
-  } else if (input == 'B' || input == 'b') {
-    // todo pripojenie k existujucej simulacii
-  } else if (input == 'C' || input == 'c') {
-    // todo opatovne spustenie simulacie
-  } else if (input == 'D' || input == 'd') {
-    exit(0);
+      if (sim.interactive_world) {
+        start_interactive_mode(&sim);
+      } else {
+        start_summary_mode(&sim);
+      }
+    } else if (input == 'B' || input == 'b') {
+      // todo pripojenie k existujucej simulacii
+    } else if (input == 'C' || input == 'c') {
+      // todo opatovne spustenie simulacie
+    } else if (input == 'D' || input == 'd') {
+      printf("Koniec programu\n");
+      break;
+    } else {
+      printf("Neplatna moznost, skus znova.\n");
+    }
   }
-
-  return 0;
 }
+
+// TEST funkcnosti
+// int main(int argc, char *argv[]) {
+//   menu();
+//   return 0;
+// }
