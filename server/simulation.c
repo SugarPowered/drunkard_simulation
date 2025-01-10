@@ -1,9 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
+//
+// Created by michal.subert on 10. 1. 2025.
+//
 
-#include "menu.h"
-
-#include <math.h>
+#include "simulation.h"
 
 void input_direction_probability(simulation *sim) {
 
@@ -22,12 +21,13 @@ void input_direction_probability(simulation *sim) {
     printf("Suma pravdepodobnosti musi byt 1! Skus znova.\n");
     input_direction_probability(sim);
   }
+
 }
 
-void initialize_simulation(simulation *sim) {
+void input_simulation_params(simulation *sim) {
 
   printf("Zadaj x a y rozmery sveta: \n");
-  scanf(" %d %d", &sim->world_x, &sim->world_y);
+  scanf(" %d %d", &sim->world.world_x, &sim->world.world_y);
 
   printf("Zadaj pocet replikacii: \n");
   scanf(" %d", &sim->replications);
@@ -35,7 +35,7 @@ void initialize_simulation(simulation *sim) {
   input_direction_probability(sim);
 
   printf("Zadaj maximalny pocet krokov chodca: \n");
-  scanf( " %zu", &sim->max_steps);
+  scanf( " %d", &sim->max_steps);
 
   printf("Zadaj meno subora, kde sa ulozi vysledok: \n");
   scanf(" %99s", &sim->file_to_save);
@@ -92,37 +92,15 @@ void start_summary_mode(simulation *sim) {
   exit(0);
 }
 
-void menu() {
-  char input;
+simulation * create_simulation(int world_x, int world_y, int replications, int propabilities[4],
+  int max_steps, char * file_to_save, bool interactive_world, bool obstacle_world, char * file_to_load) {
+  simulation *sim = malloc(sizeof(simulation));
 
-  while (1) {
-    print_ascii_menu_screen();
-    scanf(" %c", &input);
+    // todo initialize grid or other structures as needed
 
-    if (input == 'A' || input == 'a') {
-      simulation sim;
-      initialize_simulation(&sim);
-
-      if (sim.interactive_world) {
-        start_interactive_mode(&sim);
-      } else {
-        start_summary_mode(&sim);
-      }
-    } else if (input == 'B' || input == 'b') {
-      // todo pripojenie k existujucej simulacii
-    } else if (input == 'C' || input == 'c') {
-      // todo opatovne spustenie simulacie
-    } else if (input == 'D' || input == 'd') {
-      printf("Koniec programu\n");
-      break;
-    } else {
-      printf("Neplatna moznost, skus znova.\n");
-    }
-  }
+    return sim;
 }
 
-// TEST funkcnosti
-// int main(int argc, char *argv[]) {
-//   menu();
-//   return 0;
-// }
+void run_simulation(simulation *sim) {
+    // todo simulation logic goes here (movement, collision detection)
+}
