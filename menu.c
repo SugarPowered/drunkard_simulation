@@ -1,18 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include <stdatomic.h>
-#include <string.h>
-
-typedef struct simulation {
-  int world_x;
-  int world_y;
-  int replications;
-  double probabilities[4];
-  int max_steps;
-  char * file_to_save;
-} simulation;
+#include "menu.h"
 
 simulation init_simulation_parameters() {
   simulation sim;
@@ -72,7 +60,6 @@ int main(int argc, char *argv[])
   scanf(" %c", &input);
 
   if (input == 'A' || input == 'a') {
-    // todo init simulacie
     simulation sim = init_simulation_parameters();
     /* simulation_init(
      &sim.world_x, &sim.world_y, &sim.replications, &sim.probabilities,
