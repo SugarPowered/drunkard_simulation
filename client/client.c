@@ -5,12 +5,22 @@
 #include "../sockets-lib/socket.h"
 
 // Funkcia na odoslanie správy na server
-void send_to_server(int socket_fd, const char *message) {
-    if (write(socket_fd, message, strlen(message)) == -1) {
-        perror("Failed to send message to server");
-    } else {
-        printf("Message sent to server: %s\n", message);
+void send_to_server(const char *message) {
+    int sock = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
+    if (sock < 0) {
+        fprintf(stderr, "Failed to connect to server.\n");
+        return;
     }
+
+    if (write(sock, message, strlen(message)) < 0) {
+        perror("Error sending data to server");
+        active_socket_destroy(sock);
+        return;
+    }
+
+    printf("Message sent to server successfully.\n");
+
+    active_socket_destroy(sock);
 }
 
 // Funkcia na prijatie odpovede zo servera

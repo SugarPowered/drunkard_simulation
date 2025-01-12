@@ -44,7 +44,7 @@ int main() {
         }
 
         // Odoslanie používateľského vstupu na server
-        send_to_server(socket_fd, user_input);
+        send_to_server(user_input);
     }
 
     return 0;

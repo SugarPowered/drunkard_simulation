@@ -35,24 +35,6 @@ void print_ascii_menu_screen() {
     printf("[D] Koniec programu \n");
 }
 
-void send_to_server(const char *message) {
-    int sock = connect_to_server(SERVER_IP, SERVER_PORT);
-    if (sock < 0) {
-        fprintf(stderr, "Failed to connect to server.\n");
-        return;
-    }
-
-    if (write(sock, message, strlen(message)) < 0) {
-        perror("Error sending data to server");
-        active_socket_destroy(sock);
-        return;
-    }
-
-    printf("Message sent to server successfully.\n");
-
-    active_socket_destroy(sock);
-}
-
 void get_simulation_parameters() {
     int world_width, world_height, replications, max_steps;
     double probabilities[4], sum = 0.0;
