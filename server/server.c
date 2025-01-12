@@ -1,9 +1,24 @@
-// server.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "server.h"
 #include "../sockets-lib/socket.h"
-// Structure to pass client socket to thread
 
-// Function to handle a client connection
+#define BUFFER_SIZE 1024
+#define PORT 12345
+
+void process_client_input(simulation_state_t *state, const char *input) {
+    if (strncmp(input, "START_SIMULATION", 16) == 0) {
+        printf("Starting a new simulation...\n");
+        // Extract and process parameters for the simulation
+    } else if (strncmp(input, "REPLAY_SIMULATION", 17) == 0) {
+        printf("Replaying a previous simulation...\n");
+        // Load and handle the replay logic
+    } else {
+        printf("Unknown command: %s\n", input);
+    }
+}
 
 void *handle_client(void *arg) {
     client_data_t *client_data = (client_data_t *)arg;
@@ -14,7 +29,7 @@ void *handle_client(void *arg) {
     const char *welcome_msg = "Welcome to the Random Walk Simulation Server!\n";
     write(client_socket, welcome_msg, strlen(welcome_msg));
 
-    simulation_state_t *state = get_simulation_state(); // Získanie stavu zo simulácie
+    simulation_state_t *state = get_simulation_state(); // Get simulation state
 
     while (1) {
         memset(buffer, 0, BUFFER_SIZE);
@@ -27,7 +42,7 @@ void *handle_client(void *arg) {
 
         printf("Received from client: %s\n", buffer);
 
-        // Spracovanie vstupu klienta pomocou externého volania
+        // Process client input
         process_client_input(state, buffer);
 
         const char *response = "Command processed.\n";
@@ -38,7 +53,6 @@ void *handle_client(void *arg) {
     return NULL;
 }
 
-// Main server loop
 void run_server() {
     int server_socket = passive_socket_init(PORT);
 
@@ -84,7 +98,6 @@ void run_server() {
     passive_socket_destroy(server_socket);
 }
 
-// server.c
 void initialize_server(int port) {
     int server_socket = passive_socket_init(port);
     if (server_socket < 0) {
@@ -96,3 +109,7 @@ void initialize_server(int port) {
     run_server();
 }
 
+int main() {
+    initialize_server(PORT);
+    return 0;
+}
