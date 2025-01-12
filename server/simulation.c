@@ -52,41 +52,41 @@ void process_client_input_locally(simulation_state_t *state, const char *input) 
 
     // Skip the first token (which is "START_SIMULATION")
     token = strtok(input_copy, delimiter); // First token (should be "START_SIMULATION")
-    printf("curr token: %s \n", token);
+    printf("curr token START: %s \n", token);
 
     // Second token: world width
     token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
+    printf("curr token WIDTH: %s \n", token);
     global_simulation_state.world_width = atoi(token);
 
     // Third token: world height
     token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
+    printf("curr token HEIGHT: %s \n", token);
     global_simulation_state.world_height = atoi(token);
 
     // Fourth token: number of replications
     token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
+    printf("curr token REPL: %s \n", token);
     global_simulation_state.num_replications = atoi(token);
 
     // Fifth token: probabilities (comma separated)
-    token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
-    char *prob_token = strtok(token, ",");
-    for (int i = 0; i < 4 && prob_token != NULL; i++) {
-        global_simulation_state.move_probabilities[i] = atof(prob_token);
-        prob_token = strtok(NULL, ",");
-        printf("curr token: %s \n", prob_token);
+    //token = strtok(NULL, delimiter);
+    //char *prob_token = strtok(token, ",");
+    //printf("curr token PROPBS: %s \n", token);
+    for (int i = 0; i < 4; i++) {
+        token = strtok(NULL, ",");
+        global_simulation_state.move_probabilities[i] = atof(token);
+        printf("curr token I%d: %s \n", i, token);
     }
 
     // Sixth token: max steps
     token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
+    printf("curr token STEPS: %s \n", token);
     global_simulation_state.max_steps = atoi(token);
 
     // Seventh token: output file name
     token = strtok(NULL, delimiter);
-    printf("curr token: %s \n", token);
+    printf("curr token OUTFILE: %s \n", token);
     snprintf(global_simulation_state.results_file, sizeof(global_simulation_state.results_file), "%s", token);
 
     // Set in_menu and interactive_mode
