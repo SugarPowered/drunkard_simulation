@@ -2,10 +2,13 @@
 // Created by michal.subert on 10. 1. 2025.
 //
 
+
 #include "client.h"
+#include "menu.h"
 
 int main() {
-    Client client;
-    client_connect(&client, "localhost", PORT); //todo change the IP
+    printf("Vitajte v simulácii! Spúšťam hlavné menu...\n");
+    start_menu();
+    return 0;
     return 0;
 }
