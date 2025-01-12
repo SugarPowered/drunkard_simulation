@@ -1,7 +1,3 @@
-//
-// Created by michal.subert on 10. 1. 2025.
-//
-
 #ifndef SERVER_H
 #define SERVER_H
 

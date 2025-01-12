@@ -1,9 +1,5 @@
-//
-// Created by michal.subert on 10. 1. 2025.
-//
-// server/simulation.c
+#pragma once
 
-// simulation.c
 #include "simulation.h"
 #include <stdio.h>
 #include <string.h>
