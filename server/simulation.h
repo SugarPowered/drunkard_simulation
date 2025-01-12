@@ -5,6 +5,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 #include <stdbool.h>
+#include <stdio.h>
 
 // Maximum size for simulation world dimensions
 #define MAX_WORLD_SIZE 100
