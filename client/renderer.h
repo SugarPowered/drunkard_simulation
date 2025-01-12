@@ -5,6 +5,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-void draw(); // Function to draw the current state of the simulation.
+void render_simulation(const char *simulation_state); // Function to draw the current state of the simulation.
 
 #endif // RENDERER_H

@@ -1,24 +1,14 @@
-//
-// Created by michal.subert on 10. 1. 2025.
-//
-
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include "renderer.h"
-#include "input_handler.h"
+#include "../sockets-lib/socket.h"
 
-#define PORT 8080
+// Definícia portu a adresy servera
+#define SERVER_PORT 12345
+#define SERVER_ADDRESS "127.0.0.1"
 
-typedef struct {
-    int socket;
-} Client;
-
-void client_connect(Client *client, const char *ip, int port);
-void receive_data(Client *client);
+// Funkcie na komunikáciu so serverom
+void send_to_server(int socket, const char *message);
+int receive_from_server(int socket, char *buffer, int buffer_size);
 
 #endif // CLIENT_H

@@ -2,7 +2,4 @@
 
 #include "../server/simulation.h"
 
-void start_menu();
-
-
-
+void print_ascii_menu_screen();
