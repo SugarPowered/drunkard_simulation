@@ -6,13 +6,13 @@
 int main() {
     simulation_state_t *state = get_simulation_state();
 
-    // Initialize simulation state
-    initialize_simulation(state);
-
-    printf("Simulation initialized. Starting server...\n");
-
     // Start the server
     initialize_server(PORT);
+
+    printf("Server started. Simulation initializing. ...\n");
+
+    // Initialize simulation state
+    initialize_simulation(state);
 
     return 0;
 }
