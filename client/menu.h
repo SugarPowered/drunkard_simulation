@@ -3,7 +3,6 @@
 
 #include "../server/simulation.h"
 
-void send_to_server(const char *message);
 void get_simulation_parameters();
 void get_replay_parameters();
 void display_menu();

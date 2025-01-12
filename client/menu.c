@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 #include "menu.h"
+
+#include "client.h"
 #include "../sockets-lib/socket.h"
 
 void print_ascii_menu_screen() {
@@ -29,7 +31,7 @@ void print_ascii_menu_screen() {
     printf("[A] Nova simulacia \n");
     printf("[B] Pripojenie k simulacii \n");
     printf("[C] Opatovne spustenie simulacie \n");
-    printf("[D] Koniec programu \n");
+    printf("[D] Koniec programu \n \n");
 }
 
 void get_simulation_parameters() {
