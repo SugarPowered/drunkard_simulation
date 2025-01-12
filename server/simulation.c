@@ -47,6 +47,7 @@ void print_simulation_state(const simulation_state_t *state) {
 void process_client_input_locally(simulation_state_t *state, const char *input) {
 	char *token;
     char *input_copy = calloc(strlen(input) + 1, sizeof(char)); // Duplicate input to avoid modifying original string
+    strcpy(input_copy, input);
     const char delimiter[] = ";";
 
     // Skip the first token (which is "START_SIMULATION")
