@@ -10,8 +10,6 @@ static simulation_state_t global_simulation_state;
 // Initialize the simulation state with socket input values
 void initialize_simulation(simulation_state_t *state) {
 
-    state = &global_simulation_state;
-
     // Initialize obstacles to false
     for (int i = 0; i < MAX_WORLD_SIZE; ++i) {
         for (int j = 0; j < MAX_WORLD_SIZE; ++j) {
@@ -52,21 +50,21 @@ void process_client_input_locally(simulation_state_t *state, const char *input) 
 
     // Skip the first token (which is "START_SIMULATION")
     token = strtok(input_copy, delimiter); // First token (should be "START_SIMULATION")
-    printf("curr token START: %s \n", token);
+    //printf("curr token START: %s \n", token);
 
     // Second token: world width
     token = strtok(NULL, delimiter);
-    printf("curr token WIDTH: %s \n", token);
+    //printf("curr token WIDTH: %s \n", token);
     global_simulation_state.world_width = atoi(token);
 
     // Third token: world height
     token = strtok(NULL, delimiter);
-    printf("curr token HEIGHT: %s \n", token);
+    //printf("curr token HEIGHT: %s \n", token);
     global_simulation_state.world_height = atoi(token);
 
     // Fourth token: number of replications
     token = strtok(NULL, delimiter);
-    printf("curr token REPL: %s \n", token);
+    //printf("curr token REPL: %s \n", token);
     global_simulation_state.num_replications = atoi(token);
 
     // Fifth token: probabilities (comma separated)
@@ -76,21 +74,21 @@ void process_client_input_locally(simulation_state_t *state, const char *input) 
     for (int i = 0; i < 3; i++) {
         token = strtok(NULL, ",");
         global_simulation_state.move_probabilities[i] = atof(token);
-        printf("curr token I%d: %s \n", i, token);
+        //("curr token I%d: %s \n", i, token);
     }
     token = strtok(NULL, delimiter);
     global_simulation_state.move_probabilities[3] = atof(token);
-    printf("curr token I3: %s \n", token);
+    //printf("curr token I3: %s \n", token);
 
 
     // Sixth token: max steps
     token = strtok(NULL, delimiter);
-    printf("curr token STEPS: %s \n", token);
+    //printf("curr token STEPS: %s \n", token);
     global_simulation_state.max_steps = atoi(token);
 
     // Seventh token: output file name
     token = strtok(NULL, delimiter);
-    printf("curr token OUTFILE: %s \n", token);
+    //printf("curr token OUTFILE: %s \n", token);
     snprintf(global_simulation_state.results_file, sizeof(global_simulation_state.results_file), "%s", token);
 
     // Set in_menu and interactive_mode
@@ -98,6 +96,8 @@ void process_client_input_locally(simulation_state_t *state, const char *input) 
     global_simulation_state.interactive_mode = true;
 
     free(input_copy); // Free the duplicated string
+
+    initialize_simulation(&global_simulation_state);
 }
 
 // Retrieve the global simulation state
