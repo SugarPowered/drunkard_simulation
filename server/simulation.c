@@ -35,7 +35,7 @@ void initialize_simulation() {
     }
 
     for (int i = 0; i < state.num_replications; ++i) {
-      perform_replications(state, result_file);
+      perform_replications(result_file);
     }
 
     fclose(result_file);
@@ -124,24 +124,24 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
-void perform_replications(simulation_state_t *state, FILE *file) {
+void perform_replications(FILE *file) {
     fprintf(file, "Replication results:\n");
-    for (int x = 0; x < state->world_width; ++x) {
-        for (int y = 0; y < state->world_height; ++y) {
-            if (state->obstacles[x][y]) continue;
+    for (int x = 0; x < global_simulation_state.world_width; ++x) {
+        for (int y = 0; y < global_simulation_state.world_height; ++y) {
+            if (global_simulation_state.obstacles[x][y]) continue;
 
             fprintf(file, "Starting from (%d, %d):\n", x, y);
 
             // Simulate K steps for each point
-            for (int i = 0; i < state->num_replications; ++i) {
+            for (int i = 0; i < global_simulation_state.num_replications; ++i) {
                 int steps = 0;
                 int cx = x, cy = y;
 
-                while (steps < state->max_steps && !(cx == 0 && cy == 0)) {
+                while (steps < global_simulation_state.max_steps && !(cx == 0 && cy == 0)) {
                     double rand_val = (double)rand() / RAND_MAX;
-                    if (rand_val < state->move_probabilities[0]) cy--; // Up
-                    else if (rand_val < state->move_probabilities[0] + state->move_probabilities[1]) cy++; // Down
-                    else if (rand_val < state->move_probabilities[0] + state->move_probabilities[1] + state->move_probabilities[2]) cx--; // Left
+                    if (rand_val < global_simulation_state.move_probabilities[0]) cy--; // Up
+                    else if (rand_val < global_simulation_state.move_probabilities[0] + global_simulation_state.move_probabilities[1]) cy++; // Down
+                    else if (rand_val < global_simulation_state.move_probabilities[0] + global_simulation_state.move_probabilities[1] + global_simulation_state.move_probabilities[2]) cx--; // Left
                     else cx++; // Right
 
                     steps++;
@@ -152,5 +152,5 @@ void perform_replications(simulation_state_t *state, FILE *file) {
         }
     }
 
-    printf("Results saved to %s.\n", state->results_file);
+    printf("Results saved to %s.\n", global_simulation_state.results_file);
 }
