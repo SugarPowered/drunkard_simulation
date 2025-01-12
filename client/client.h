@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <winsock2.h> // funguje na WIN
-//#include <arpa/inet.h> funguje iba na UNIX
 #include "renderer.h"
 #include "input_handler.h"
 
