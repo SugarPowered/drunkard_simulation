@@ -10,7 +10,7 @@
 void process_client_input(simulation_state_t *state, const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Starting a new simulation...\n");
-        process_client_input_locally(state, input); // Extract and process parameters for the simulation
+        process_client_input_locally(input); // Extract and process parameters for the simulation
     } else if (strncmp(input, "REPLAY_SIMULATION", 17) == 0) {
         printf("Replaying a previous simulation...\n");
         // Load and handle the replay logic

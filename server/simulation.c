@@ -5,44 +5,63 @@
 #include <string.h>
 #include <stdlib.h>
 
-static simulation_state_t global_simulation_state;
+simulation_state_t global_simulation_state = {
+    .world_width = 0,
+    .world_height = 0,
+    .num_replications = 0,
+    .move_probabilities = {0},
+    .max_steps = 0,
+    .results_file = "",
+    .in_menu = false,
+    .interactive_mode = false
+};
 
 // Initialize the simulation state with socket input values
-void initialize_simulation(simulation_state_t *state) {
+void initialize_simulation() {
+
+    simulation_state_t state = global_simulation_state;
 
     // Initialize obstacles to false
     for (int i = 0; i < MAX_WORLD_SIZE; ++i) {
         for (int j = 0; j < MAX_WORLD_SIZE; ++j) {
-            state->obstacles[i][j] = false;
+            state.obstacles[i][j] = false;
         }
     }
 
-    for (int i = 0; i < state->num_replications; ++i) {
-      perform_replications(state);
+    FILE *result_file = fopen(state.results_file, "w");
+    if (!result_file) {
+        fprintf(stderr, "Failed to open results file.\n");
+        return;
     }
+
+    for (int i = 0; i < state.num_replications; ++i) {
+      perform_replications(state, result_file);
+    }
+
+    fclose(result_file);
 }
 
 // Reset the simulation state to default values
-void reset_simulation(simulation_state_t *state) {
-    initialize_simulation(state);
+void reset_simulation() {
+    initialize_simulation();
 }
 
 // Print the current simulation state
-void print_simulation_state(const simulation_state_t *state) {
+void print_simulation_state() {
     printf("Simulation State:\n");
-    printf("  In Menu: %s\n", state->in_menu ? "Yes" : "No");
-    printf("  Mode: %s\n", state->interactive_mode ? "Interactive" : "Summary");
-    printf("  World Dimensions: %dx%d\n", state->world_width, state->world_height);
-    printf("  Max Steps: %d\n", state->max_steps);
-    printf("  Replications: %d\n", state->num_replications);
+    printf("  In Menu: %s\n", global_simulation_state.in_menu ? "Yes" : "No");
+    printf("  Mode: %s\n", global_simulation_state.interactive_mode ? "Interactive" : "Summary");
+    printf("  World Dimensions: %dx%d\n", global_simulation_state.world_width, global_simulation_state.world_height);
+    printf("  Max Steps: %d\n", global_simulation_state.max_steps);
+    printf("  Replications: %d\n", global_simulation_state.num_replications);
     printf("  Move Probabilities: Up=%.2f, Down=%.2f, Left=%.2f, Right=%.2f\n",
-           state->move_probabilities[0], state->move_probabilities[1],
-           state->move_probabilities[2], state->move_probabilities[3]);
-    printf("  Results File: %s\n", state->results_file);
+           global_simulation_state.move_probabilities[0], global_simulation_state.move_probabilities[1],
+           global_simulation_state.move_probabilities[2], global_simulation_state.move_probabilities[3]);
+    printf("  Results File: %s\n", global_simulation_state.results_file);
 }
 
 // Update simulation global state based on socket input
-void process_client_input_locally(simulation_state_t *state, const char *input) {
+void process_client_input_locally(const char *input) {
 	char *token;
     char *input_copy = calloc(strlen(input) + 1, sizeof(char)); // Duplicate input to avoid modifying original string
     strcpy(input_copy, input);
@@ -105,19 +124,13 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
-void perform_replications(simulation_state_t *state) {
-    FILE *result_file = fopen(state->results_file, "w");
-    if (!result_file) {
-        fprintf(stderr, "Failed to open results file.\n");
-        return;
-    }
-
-    fprintf(result_file, "Replication results:\n");
+void perform_replications(simulation_state_t *state, FILE *file) {
+    fprintf(file, "Replication results:\n");
     for (int x = 0; x < state->world_width; ++x) {
         for (int y = 0; y < state->world_height; ++y) {
             if (state->obstacles[x][y]) continue;
 
-            fprintf(result_file, "Starting from (%d, %d):\n", x, y);
+            fprintf(file, "Starting from (%d, %d):\n", x, y);
 
             // Simulate K steps for each point
             for (int i = 0; i < state->num_replications; ++i) {
@@ -134,11 +147,10 @@ void perform_replications(simulation_state_t *state) {
                     steps++;
                 }
 
-                fprintf(result_file, "  Replication %d: %d steps\n", i + 1, steps);
+                fprintf(file, "  Replication %d: %d steps\n", i + 1, steps);
             }
         }
     }
 
-    fclose(result_file);
     printf("Results saved to %s.\n", state->results_file);
 }
