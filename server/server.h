@@ -13,10 +13,8 @@
 #include "../sockets-lib/socket.h"
 #include "simulation.h"
 
-#define PORT 12345
+#define PORT 27199
 #define BUFFER_SIZE 1024
-
-
 
 typedef struct {
     int client_socket;
