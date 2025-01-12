@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "menu.h"
 #include "../sockets-lib/socket.h"
 
 #define BUFFER_SIZE 1024
@@ -21,7 +23,8 @@ int main() {
     while (1) {
         // Prijatie správy od servera
         if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
-            printf("Server: %s\n", buffer);
+            display_menu();
+            //printf("Server: %s\n", buffer);
         }
 
         // Získanie vstupu od používateľa
