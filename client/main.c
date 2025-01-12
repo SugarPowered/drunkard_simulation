@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "../sockets-lib/socket.h"
 
 #define BUFFER_SIZE 1024
 

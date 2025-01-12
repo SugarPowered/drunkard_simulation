@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include "renderer.h"
+#include "../sockets-lib/socket.h"
+
 
 #define WORLD_SIZE 20
 #define BUFFER_SIZE 1024
