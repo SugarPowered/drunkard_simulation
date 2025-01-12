@@ -52,13 +52,7 @@ void *handle_client(void *arg) {
     return NULL;
 }
 
-void run_server() {
-    int server_socket = passive_socket_init(PORT);
-
-    if (server_socket < 0) {
-        fprintf(stderr, "Failed to initialize server socket.\n");
-        exit(EXIT_FAILURE);
-    }
+void run_server(int server_socket) {
 
     printf("Server is running on port %d. Waiting for connections...\n", PORT);
 
@@ -105,5 +99,5 @@ void initialize_server(int port) {
     }
 
     printf("Server initialized on port %d.\n", port);
-    run_server();
+    run_server(server_socket);
 }

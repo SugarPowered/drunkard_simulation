@@ -9,7 +9,7 @@
 #include "../sockets-lib/socket.h"
 #include "simulation.h"
 
-#define PORT 27200
+#define PORT 13141
 #define BUFFER_SIZE 1024
 
 typedef struct {
