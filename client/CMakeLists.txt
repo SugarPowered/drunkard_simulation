@@ -1,4 +1,4 @@
 add_executable(rw_client)
-target_sources(rw_client PRIVATE client.c main.c input_handler.c menu.c renderer.c) 
+target_sources(rw_client PRIVATE client.c main.c menu.c renderer.c)
 target_compile_options(rw_client PUBLIC "-std=c11")
 target_compile_options(rw_client PRIVATE "-Wall" "-Wextra" "-Wpedantic")
