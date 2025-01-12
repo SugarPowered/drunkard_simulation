@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -107,9 +109,4 @@ void initialize_server(int port) {
 
     printf("Server initialized on port %d.\n", port);
     run_server();
-}
-
-int main() {
-    initialize_server(PORT);
-    return 0;
 }
