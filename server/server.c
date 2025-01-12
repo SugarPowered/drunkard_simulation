@@ -7,9 +7,6 @@
 #include "server.h"
 #include "../sockets-lib/socket.h"
 
-#define BUFFER_SIZE 1024
-#define PORT 12345
-
 void process_client_input(simulation_state_t *state, const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Starting a new simulation...\n");
