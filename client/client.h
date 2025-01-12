@@ -4,7 +4,7 @@
 #include "../sockets-lib/socket.h"
 
 // Definícia portu a adresy servera
-#define SERVER_PORT 27199
+#define SERVER_PORT 27200
 #define SERVER_ADDRESS "127.0.0.1"
 
 // Funkcie na komunikáciu so serverom

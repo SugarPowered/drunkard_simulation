@@ -7,9 +7,6 @@
 #include "menu.h"
 #include "../sockets-lib/socket.h"
 
-#define SERVER_PORT 12345
-#define SERVER_IP "127.0.0.1"
-
 void print_ascii_menu_screen() {
     printf("==========================================================\n");
     printf("          __  _               _         __               \n");
