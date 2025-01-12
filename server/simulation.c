@@ -73,11 +73,15 @@ void process_client_input_locally(simulation_state_t *state, const char *input) 
     //token = strtok(NULL, delimiter);
     //char *prob_token = strtok(token, ",");
     //printf("curr token PROPBS: %s \n", token);
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
         token = strtok(NULL, ",");
         global_simulation_state.move_probabilities[i] = atof(token);
         printf("curr token I%d: %s \n", i, token);
     }
+    token = strtok(NULL, delimiter);
+    global_simulation_state.move_probabilities[3] = atof(token);
+    printf("curr token I3: %s \n", token);
+
 
     // Sixth token: max steps
     token = strtok(NULL, delimiter);
