@@ -31,7 +31,7 @@ typedef struct {
 void initialize_simulation(simulation_state_t *state);
 void reset_simulation(simulation_state_t *state);
 void print_simulation_state(const simulation_state_t *state);
-void process_client_input(simulation_state_t *state, const char *input);
+void process_client_input_locally(simulation_state_t *state, const char *input);
 simulation_state_t *get_simulation_state();
 void perform_replications(simulation_state_t *state);
 

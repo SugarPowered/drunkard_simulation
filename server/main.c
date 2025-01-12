@@ -1,7 +1,4 @@
-//
-// Created by michal.subert on 10. 1. 2025.
-//
-// server/main.c
+#pragma once
 
 #include "server.h"
 #include "simulation.h"
@@ -15,7 +12,7 @@ int main() {
     printf("Simulation initialized. Starting server...\n");
 
     // Start the server
-    run_server();
+    initialize_server(PORT);
 
     return 0;
 }

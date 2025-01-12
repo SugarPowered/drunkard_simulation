@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,22 +10,29 @@
 #define SERVER_PORT 12345
 #define SERVER_IP "127.0.0.1"
 
-void send_to_server(const char *message) {
-    int sock = connect_to_server(SERVER_IP, SERVER_PORT);
-    if (sock < 0) {
-        fprintf(stderr, "Failed to connect to server.\n");
-        return;
-    }
-
-    if (write(sock, message, strlen(message)) < 0) {
-        perror("Error sending data to server");
-        active_socket_destroy(sock);
-        return;
-    }
-
-    printf("Message sent to server successfully.\n");
-
-    active_socket_destroy(sock);
+void print_ascii_menu_screen() {
+    printf("==========================================================\n");
+    printf("          __  _               _         __               \n");
+    printf("         /_/ | |             | |       /_/               \n");
+    printf("  _ __   __ _| |__   ___   __| |_ __   __ _              \n");
+    printf(" | '_ \\ / _` | '_ \\ / _ \\ / _` | '_ \\ / _` |             \n");
+    printf(" | | | | (_| | | | | (_) | (_| | | | | (_| |             \n");
+    printf(" |_| |_|\\__,_|_| |_|\\___/ \\__,_|_| |_|\\__,_|             \n");
+    printf("                   _      //\\      _     _              \n");
+    printf("                  | |    |/ \\|    | |   | |             \n");
+    printf("  _ __   ___   ___| |__   ___   __| |___| | ____ _      \n");
+    printf(" | '_ \\ / _ \\ / __| '_ \\ / _ \\ / _` |_  / |/ / _` |      \n");
+    printf(" | |_) | (_) | (__| | | | (_) | (_| |/ /|   < (_| |      \n");
+    printf(" | .__/ \\___/ \\___|_| |_|\\___/ \\__,_/___|_|\\_\\__,_|      \n");
+    printf(" | |                                                    \n");
+    printf(" |_|         by **Denis Uhrik & Michal Šubert**         \n");
+    printf("==========================================================\n \n");
+    printf("~~ Vita vas simulacia nahodnej pochodzky. ~~\n");
+    printf("Zvolte si jednu z moznosti a napiste prislusne pismeno do terminalu.\n\n");
+    printf("[A] Nova simulacia \n");
+    printf("[B] Pripojenie k simulacii \n");
+    printf("[C] Opatovne spustenie simulacie \n");
+    printf("[D] Koniec programu \n");
 }
 
 void get_simulation_parameters() {
