@@ -12,7 +12,7 @@ int main() {
     printf("Simulation initialized. Starting server...\n");
 
     // Start the server
-    run_server();
+    initialize_server(PORT);
 
     return 0;
 }

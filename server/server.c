@@ -10,7 +10,7 @@
 #define BUFFER_SIZE 1024
 #define PORT 12345
 
-void process_client_input(simulation_state_t *state, const char *input) {
+void process_client_input_socket(simulation_state_t *state, const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Starting a new simulation...\n");
         // Extract and process parameters for the simulation
@@ -45,7 +45,7 @@ void *handle_client(void *arg) {
         printf("Received from client: %s\n", buffer);
 
         // Process client input
-        process_client_input(state, buffer);
+        process_client_input_socket(state, buffer);
 
         const char *response = "Command processed.\n";
         write(client_socket, response, strlen(response));
@@ -109,9 +109,4 @@ void initialize_server(int port) {
 
     printf("Server initialized on port %d.\n", port);
     run_server();
-}
-
-int main() {
-    initialize_server(PORT);
-    return 0;
 }

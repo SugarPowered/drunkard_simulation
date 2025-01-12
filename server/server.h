@@ -22,5 +22,6 @@ typedef struct {
 void initialize_server(int port);
 void *handle_client(void *arg);
 void run_server();
+void process_client_input_socket(simulation_state_t *state, const char *input);
 
 #endif // SERVER_H

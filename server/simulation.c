@@ -53,7 +53,7 @@ void print_simulation_state(const simulation_state_t *state) {
 }
 
 // Update simulation state based on socket input
-void process_client_input(simulation_state_t *state, const char *input) {
+void process_client_input_locally(simulation_state_t *state, const char *input) {
     if (strncmp(input, "SET_MENU", 8) == 0) {
         state->in_menu = true;
         printf("Switched to menu mode.\n");
