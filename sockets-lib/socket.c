@@ -1,87 +1,93 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+// server.c
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdlib.h>
-
+#include <pthread.h>
 #include "socket.h"
 
-int passive_socket_init(const int port) {
-  int passSock;
-  struct sockaddr_in servAddr;
-  // Vytvorenie schránky pre komunikáciu cez internet
-  passSock = socket(AF_INET, SOCK_STREAM, 0);
-  if (passSock < 0) {
-    perror("Chyba pri vytvarani schranky");
-    return -1;
-  }
-  // Nastavenie adresy pre potreby komunikácie
-  memset((char*)&servAddr, 0, sizeof(servAddr));
-  servAddr.sin_family = AF_INET;
-  servAddr.sin_addr.s_addr = INADDR_ANY;
-  servAddr.sin_port = htons(port);
-  if (bind(passSock, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0) {
-    perror("Chyba pri nastavovani adresy schranky");
-    return -1;
-  }
-  // Vytvorenie pasívnej schránky pre prijímanie pripojení
-  listen(passSock, 5);
-  return passSock;
-}
+#define PORT 12345
+#define BUFFER_SIZE 1024
 
-int passive_socket_wait_for_client(int passiveSocket) {
-  struct sockaddr_in clAddr;
-  socklen_t clSize = sizeof(clAddr);
-  int actSock = accept(passiveSocket, (struct sockaddr*)&clAddr, &clSize);
-  if (actSock < 0) {
-    perror("Chyba pri akceptacii schranky!");
-    return -1;
-  }
-  return actSock;
-}
+// Structure to pass client socket to thread
+typedef struct {
+    int client_socket;
+} client_data_t;
 
-void passive_socket_destroy(int socket) {
-  close(socket);
-}
- 
-int connect_to_server(const char * name, const int port) {
-  struct addrinfo * server;
-  struct addrinfo hints;
-  hints.ai_family = AF_INET; // IP4 aj IP6
-  hints.ai_socktype = SOCK_STREAM; // Spoľahlivá komunikácia
-  // hints.ai_protocol = IPPROTO_TCP; // TCP/IP
-  // Zisťovanie adresy servera podľa mena
-  // Pozor! môže existovať v určitých prípadoch aj viac dostupných adries
-  char portText[10]= {0};
-  sprintf(portText, "%d", port);
-  int s = getaddrinfo(name, portText, &hints, &server);
-  if (s != 0) {
-    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-    return -1;
-  }
-  for (struct addrinfo * rp = server; rp != NULL; rp = rp->ai_next) {
-    // Vytvorenie schránky pre komunikáciu cez internet
-    int actSock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-    if (actSock < 0) {
-      continue;
+// Function to handle a client connection
+void *handle_client(void *arg) {
+    client_data_t *client_data = (client_data_t *)arg;
+    int client_socket = client_data->client_socket;
+    free(client_data);
+
+    char buffer[BUFFER_SIZE];
+
+    // Send a welcome message to the client
+    const char *welcome_msg = "Welcome to the Random Walk Simulation Server!\n";
+    write(client_socket, welcome_msg, strlen(welcome_msg));
+
+    // Read data from the client
+    while (1) {
+        memset(buffer, 0, BUFFER_SIZE);
+        int bytes_received = read(client_socket, buffer, BUFFER_SIZE - 1);
+
+        if (bytes_received <= 0) {
+            printf("Client disconnected.\n");
+            break;
+        }
+
+        printf("Received from client: %s\n", buffer);
+
+        // Echo back the data for now
+        write(client_socket, buffer, bytes_received);
     }
-    // Pripojenie na server
-    if(connect(actSock, server->ai_addr, server->ai_addrlen) < 0) {
-      // Neúspešné
-      close(actSock);
-    } else {
-      // Úspešné
-      freeaddrinfo(server); 
-      return actSock;
-    }
-  }
-  perror("Chyba pripojenia na server!");
-  freeaddrinfo(server); 
-  return -1;
+
+    close(client_socket);
+    return NULL;
 }
 
-void active_socket_destroy(int socket) {
-  close(socket);
+// Main server loop
+void run_server() {
+    int server_socket = passive_socket_init(PORT);
+
+    if (server_socket < 0) {
+        fprintf(stderr, "Failed to initialize server socket.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server is running on port %d. Waiting for connections...\n", PORT);
+
+    while (1) {
+        int client_socket = passive_socket_wait_for_client(server_socket);
+
+        if (client_socket < 0) {
+            fprintf(stderr, "Failed to accept client connection.\n");
+            continue;
+        }
+
+        printf("Client connected!\n");
+
+        // Allocate memory for client data and spawn a thread
+        client_data_t *client_data = malloc(sizeof(client_data_t));
+        if (!client_data) {
+            fprintf(stderr, "Failed to allocate memory for client data.\n");
+            close(client_socket);
+            continue;
+        }
+
+        client_data->client_socket = client_socket;
+        pthread_t client_thread;
+
+        if (pthread_create(&client_thread, NULL, handle_client, client_data) != 0) {
+            fprintf(stderr, "Failed to create thread for client.\n");
+            free(client_data);
+            close(client_socket);
+            continue;
+        }
+
+        // Detach the thread so resources are released automatically when it finishes
+        pthread_detach(client_thread);
+    }
+
+    passive_socket_destroy(server_socket);
 }

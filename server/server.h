@@ -9,22 +9,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <winsock2.h> // funguje na WIN
-//#include <arpa/inet.h> funguje iba na UNIX
-// todo can import instead ==> /home/shared/POS/sockets-lib
 #include <pthread.h>
+#include "../sockets-lib/socket.h"
 #include "simulation.h"
 
+#define PORT 12345
+#define BUFFER_SIZE 1024
 
 
-#define PORT 8080
 
 typedef struct {
-    int socket;
-    struct sockaddr_in address;
-} Server;
+    int client_socket;
+} client_data_t;
 
-void server_start(Server *server);
+// server.h
+void initialize_server(int port);
 void *handle_client(void *arg);
+void run_server();
 
 #endif // SERVER_H

@@ -1,11 +1,23 @@
 //
 // Created by michal.subert on 10. 1. 2025.
 //
+// server/main.c
 
 #include "server.h"
+#include "simulation.h"
 
 int main() {
-    Server server;
-    server_start(&server);
+    simulation_state_t *state = get_simulation_state();
+
+    // Initialize simulation state
+    initialize_simulation(state);
+
+    printf("Simulation initialized. Starting server...\n");
+
+    // Start the server
+    run_server();
+
     return 0;
 }
+
+
