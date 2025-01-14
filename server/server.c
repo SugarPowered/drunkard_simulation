@@ -44,7 +44,9 @@ void *handle_client(void *arg) {
         // Process client input
         process_client_input(state, buffer);
 
+        // todo: vyries aby sa tu dostal server dostal predtym ako padne
         const char *response = "Command processed.\n";
+        printf("About to write to client: %s\n", response);
         if (write(client_socket, response, strlen(response)) == -1) {
             perror("Error writing to socket. Client disconnected.");
             break;

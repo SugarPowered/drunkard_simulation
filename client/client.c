@@ -21,11 +21,21 @@ void send_to_server(const char *message) {
     }
 
     printf("Message sent to server successfully.\n");
+
+    char buffer[BUFFER_SIZE];
+    int bytes_received = receive_from_server(sock, buffer, BUFFER_SIZE);
+    if (bytes_received > 0) {
+        printf("Received from server: %s\n", buffer);
+    } else {
+        perror("Error receiving data from server");
+    }
+
     active_socket_destroy(sock); // tu sa socket zatvori posledny raz
 }
 
 // Funkcia na prijatie odpovede zo servera
 int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
+
   	int client_socket = socket_fd;
     memset(buffer, 0, buffer_size);
     int bytes_received = read(socket_fd, buffer, buffer_size - 1);

@@ -12,7 +12,7 @@ int main() {
     //printf("Server started. Simulation initializing. ...\n");
 
     // Initialize simulation state
-    //  initialize_simulation();
+    initialize_simulation();
     return 0;
 }
 

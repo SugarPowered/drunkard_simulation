@@ -41,7 +41,7 @@ void initialize_simulation() {
     fclose(result_file);
     printf("Results saved to %s.\n", global_simulation_state.results_file);
     print_simulation_state();
-
+    return;
 }
 
 // Reset the simulation state to default values
