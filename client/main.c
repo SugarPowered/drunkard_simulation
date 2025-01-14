@@ -24,7 +24,6 @@ int main() {
         // Prijatie správy od servera
         if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
             printf("Server: %s\n", buffer);
-            run_renderer(socket_fd);
             display_menu();
         }
 
@@ -49,6 +48,7 @@ int main() {
 
         // Odoslanie používateľského vstupu na server
         send_to_server(user_input);
+        run_renderer(socket_fd);
     }
 
     return 0;
