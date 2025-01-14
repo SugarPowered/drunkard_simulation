@@ -39,8 +39,9 @@ void initialize_simulation() {
     }
 
     fclose(result_file);
+    printf("Results saved to %s.\n", global_simulation_state.results_file);
     print_simulation_state();
-    //printf("Results saved to %s.\n", global_simulation_state.results_file);
+
 }
 
 // Reset the simulation state to default values
@@ -100,7 +101,6 @@ void process_client_input_locally(const char *input) {
     token = strtok(NULL, delimiter);
     global_simulation_state.move_probabilities[3] = atof(token);
     //printf("curr token I3: %s \n", token);
-
 
     // Sixth token: max steps
     token = strtok(NULL, delimiter);

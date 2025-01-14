@@ -2,6 +2,7 @@
 #define CLIENT_H
 
 #include "../sockets-lib/socket.h"
+#include "renderer.h"
 
 // Definícia portu a adresy servera
 #define SERVER_PORT 13141

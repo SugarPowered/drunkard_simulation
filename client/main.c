@@ -18,13 +18,12 @@ int main() {
     char buffer[BUFFER_SIZE];
     char user_input[BUFFER_SIZE];
 
-    printf("Connected to the server. Type 'exit' to quit.\n");
+    printf("Connected to the server. \n");
 
     while (1) {
         // Prijatie správy od servera
         if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
             display_menu();
-            //printf("Server: %s\n", buffer);
         }
 
         // Získanie vstupu od používateľa
@@ -49,10 +48,11 @@ int main() {
         // Odoslanie používateľského vstupu na server
         send_to_server(user_input);
 
-        // if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
-        //     //printf("Server: %s\n", buffer);
-        // }
-;
+        // Čakanie na simulačný výstup zo servera
+        if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
+            printf("Server: %s\n", buffer);
+            run_renderer(socket_fd);
+        }
     }
 
     return 0;

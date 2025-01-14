@@ -9,11 +9,10 @@ int main() {
     // Start the server
     initialize_server(PORT);
 
-    printf("Server started. Simulation initializing. ...\n");
+    //printf("Server started. Simulation initializing. ...\n");
 
     // Initialize simulation state
-    initialize_simulation();
-
+    //  initialize_simulation();
     return 0;
 }
 

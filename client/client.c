@@ -1,4 +1,5 @@
 #include "client.h"
+#include "../server/server.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -6,7 +7,12 @@
 
 // Funkcia na odoslanie správy na server
 void send_to_server(const char *message) {
+  	if(connect_to_server(SERVER_ADDRESS, SERVER_PORT) < 0) {
+          initialize_server(SERVER_PORT);
+    }
+
     int sock = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
+
     if (sock < 0) {
         fprintf(stderr, "Failed to connect to server.\n");
         return;
@@ -19,8 +25,6 @@ void send_to_server(const char *message) {
     }
 
     printf("Message sent to server successfully.\n");
-
-    active_socket_destroy(sock);
 }
 
 // Funkcia na prijatie odpovede zo servera
@@ -28,11 +32,13 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
   	int client_socket = socket_fd;
     memset(buffer, 0, buffer_size);
     int bytes_received = read(socket_fd, buffer, buffer_size - 1);
+
     if (bytes_received < 0) {
         perror("Failed to receive message from server");
         return -1;
     }
     printf("Message received from server: %s\n", buffer);
 
+    active_socket_destroy(socket_fd);
     return bytes_received;
 }
