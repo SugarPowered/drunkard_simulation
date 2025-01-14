@@ -7,10 +7,6 @@
 
 // Funkcia na odoslanie správy na server
 void send_to_server(const char *message) {
-
-//  	if(connect_to_server(SERVER_ADDRESS, SERVER_PORT) < 0) {
-//          initialize_server(SERVER_PORT);
-//    }
     int sock = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
 
     if (sock < 0) {
@@ -25,7 +21,7 @@ void send_to_server(const char *message) {
     }
 
     printf("Message sent to server successfully.\n");
-    active_socket_destroy(sock); // TODO tu sa socket zatvori posledny raz
+    active_socket_destroy(sock); // tu sa socket zatvori posledny raz
 }
 
 // Funkcia na prijatie odpovede zo servera

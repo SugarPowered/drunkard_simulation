@@ -45,7 +45,10 @@ void *handle_client(void *arg) {
         process_client_input(state, buffer);
 
         const char *response = "Command processed.\n";
-        write(client_socket, response, strlen(response));
+        if (write(client_socket, response, strlen(response)) == -1) {
+            perror("Error writing to socket. Client disconnected.");
+            break;
+        }
     }
 
     close(client_socket);
