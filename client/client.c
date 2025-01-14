@@ -22,8 +22,8 @@ void send_to_server(const char *message) {
 
     printf("Message sent to server successfully.\n");
 
-    char buffer[BUFFER_SIZE];
-    int bytes_received = receive_from_server(sock, buffer, BUFFER_SIZE);
+//    char buffer[BUFFER_SIZE];
+//    int bytes_received = receive_from_server(sock, buffer, BUFFER_SIZE);
 
     active_socket_destroy(sock); // tu sa socket zatvori posledny raz
 }

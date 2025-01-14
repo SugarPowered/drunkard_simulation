@@ -26,12 +26,12 @@ int main() {
             display_menu();
         }
 
-        // Získanie vstupu od používateľa
-        printf("You: ");
-        if (fgets(user_input, sizeof(user_input), stdin) == NULL) {
-            fprintf(stderr, "Error reading input.\n");
-            break;
-        }
+        // Získanie vstupu od používateľa - riesi menu tiez
+        // printf("You: ");
+        // if (fgets(user_input, sizeof(user_input), stdin) == NULL) {
+        //     fprintf(stderr, "Error reading input.\n");
+        //     break;
+        // }
 
         // Odstránenie nového riadku z používateľského vstupu
         size_t len = strlen(user_input);
@@ -45,8 +45,10 @@ int main() {
             break;
         }
 
-        // Odoslanie používateľského vstupu na server
-        send_to_server(user_input);
+        // !! uz je v menu 1x - Odoslanie používateľského vstupu na server
+        // send_to_server(user_input);
+
+        sleep(10);
 
         // Cakanie na odozvu od servera, vykreslenie simulacie v terminali
         if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
