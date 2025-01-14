@@ -69,7 +69,7 @@ void get_simulation_parameters() {
 
     send_to_server(buffer);
 
-    printf("\nSimulation parameters sent to server.\n");
+    printf("Simulation parameters sent to server.\n\n");
 }
 
 void get_replay_parameters() {
@@ -117,7 +117,6 @@ void display_menu() {
             case 'd':
                 printf("\nExiting the program. Goodbye!\n");
                 exit(0);
-                break;
 
             default:
                 printf("\nInvalid selection, please try again.\n");
