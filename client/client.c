@@ -24,11 +24,6 @@ void send_to_server(const char *message) {
 
     char buffer[BUFFER_SIZE];
     int bytes_received = receive_from_server(sock, buffer, BUFFER_SIZE);
-    if (bytes_received > 0) {
-        printf("Received from server: %s\n", buffer);
-    } else {
-        perror("Error receiving data from server");
-    }
 
     active_socket_destroy(sock); // tu sa socket zatvori posledny raz
 }
