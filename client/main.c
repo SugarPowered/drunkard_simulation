@@ -48,6 +48,11 @@ int main() {
 
         // Odoslanie používateľského vstupu na server
         send_to_server(user_input);
+
+        // if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
+        //     //printf("Server: %s\n", buffer);
+        // }
+;
     }
 
     return 0;

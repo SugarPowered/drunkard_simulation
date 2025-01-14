@@ -39,6 +39,8 @@ void initialize_simulation() {
     }
 
     fclose(result_file);
+    print_simulation_state();
+    //printf("Results saved to %s.\n", global_simulation_state.results_file);
 }
 
 // Reset the simulation state to default values
@@ -115,8 +117,7 @@ void process_client_input_locally(const char *input) {
     global_simulation_state.interactive_mode = true;
 
     free(input_copy); // Free the duplicated string
-
-    initialize_simulation(&global_simulation_state);
+    initialize_simulation();
 }
 
 // Retrieve the global simulation state
@@ -151,6 +152,4 @@ void perform_replications(FILE *file) {
             }
         }
     }
-
-    printf("Results saved to %s.\n", global_simulation_state.results_file);
 }

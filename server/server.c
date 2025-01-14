@@ -13,7 +13,7 @@ void process_client_input(simulation_state_t *state, const char *input) {
         process_client_input_locally(input); // Extract and process parameters for the simulation
     } else if (strncmp(input, "REPLAY_SIMULATION", 17) == 0) {
         printf("Replaying a previous simulation...\n");
-        // Load and handle the replay logic
+        reset_simulation(); // Load and handle the replay logic
     } else {
         printf("Unknown command: %s\n", input);
     }

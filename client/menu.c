@@ -103,6 +103,7 @@ void display_menu() {
             case 'B':
             case 'b':
                 printf("\nJoining an existing simulation...\n");
+                get_replay_parameters();
                 // Call function to join an existing simulation
                 break;
 
