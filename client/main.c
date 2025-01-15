@@ -3,42 +3,49 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "menu.h"
 #include "../sockets-lib/socket.h"
 
 #define BUFFER_SIZE 1024
 
 int main() {
-    // Initialize the connection once
+    // 1. Initialize the connection once
     int socket_fd = initialize_connection();
     if (socket_fd < 0) {
-        // Handle error, exit, etc.
+        fprintf(stderr, "Error: Could not connect to server.\n");
         return 1;
     }
 
+    // Possibly send or wait to receive data from the server
     char buffer[BUFFER_SIZE];
-    char user_input[BUFFER_SIZE];
-
     while (1) {
-        // Example usage: send something
-        // send_to_server("Hello server!");
+        memset(buffer, 0, sizeof(buffer));
 
-        // Then receive something
-        if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
-            // Possibly display menu or do other logic
-            display_menu();
-        }
-
-        // Check for 'exit'
-        if (strcmp(user_input, "exit") == 0) {
-            printf("Exiting...\n");
+        // 2. Wait for data from server
+        int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
+        if (bytes_received <= 0) {
+            printf("Server disconnected or error reading.\n");
             break;
         }
-        sleep(1); // Delay for demonstration
+
+        if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
+            // If server signals an exit
+            printf("SERVER SAID: SIMULATION COMPLETED! YAY\n");
+            break;
+
+        } else {
+            // Unknown or unhandled header
+            printf("Unhandled message from server: %s\n", buffer);
+        }
+
+        // 4. Possibly prompt user or do menu logic
+        display_menu();
+
+        // Example: read user input, check for "exit", send to server, etc.
+        // ...
     }
 
-    // Explicitly close when we decide
+    // 5. Clean up and close connection
     close_connection();
     return 0;
 }
