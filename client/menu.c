@@ -39,27 +39,27 @@ void get_simulation_parameters() {
     double probabilities[4], sum = 0.0;
     char output_file[100], buffer[1024];
 
-    printf("\nEnter the dimensions of the world (width height): ");
+    printf("\nVloz rozmery sveta (sirka vyska): ");
     scanf("%d %d", &world_width, &world_height);
 
-    printf("\nEnter the number of replications: ");
+    printf("\nVloz pocet replikacii: ");
     scanf("%d", &replications);
 
-    printf("\nEnter the probabilities for movement (up, down, left, right): ");
+    printf("\nVloz pravdepodobnosti pohybu (hore, dole, dolava, doprava): ");
     for (int i = 0; i < 4; i++) {
         scanf("%lf", &probabilities[i]);
         sum += probabilities[i];
     }
 
     if (sum != 1.0) {
-        printf("\nError: Probabilities must sum to 1.0.\n");
+        printf("\nError: Pravdepodobnosti sa musia scitat do 1.0.\n");
         return;
     }
 
-    printf("\nEnter the maximum number of steps (K): ");
+    printf("\nVloz maximalny pocet krokov (K): ");
     scanf("%d", &max_steps);
 
-    printf("\nEnter the output file name: ");
+    printf("\nVloz nazov vystupneho suboru: ");
     scanf("%s", output_file);
 
     snprintf(buffer, sizeof(buffer), "START_SIMULATION;%d;%d;%d;%.2f,%.2f,%.2f,%.2f;%d;%s",
@@ -69,20 +69,20 @@ void get_simulation_parameters() {
 
     send_to_server(buffer);
 
-    printf("Simulation parameters sent to server.\n\n");
+    printf("Simulacne parametre odoslane na server.\n\n");
 }
 
 void get_replay_parameters() {
     char input_file[100], buffer[1024];
 
-    printf("\nEnter the file name to load the replay from: ");
+    printf("\nVloz nazov suboru na nacitanie: ");
     scanf("%s", input_file);
 
     snprintf(buffer, sizeof(buffer), "REPLAY_SIMULATION;%s", input_file);
 
     send_to_server(buffer);
 
-    printf("\nReplay parameters sent to server.\n");
+    printf("\nParametre zopakovania simulacie odoslane na server.\n");
 }
 
 void display_menu() {
@@ -90,36 +90,36 @@ void display_menu() {
 
     while (1) {
         print_ascii_menu_screen();
-        printf("Please select an option: ");
+        printf("Prosim zvol moznost: ");
         scanf(" %c", &input);
 
         switch (input) {
             case 'A':
             case 'a':
-                printf("\nStarting a new simulation...\n");
+                printf("\nZacinam novu simulaciu...\n");
                 get_simulation_parameters();
                 break;
 
             case 'B':
             case 'b':
-                printf("\nJoining an existing simulation...\n");
+                printf("\nPripajam sa k existujucej simulacii...\n");
                 get_replay_parameters();
                 // Call function to join an existing simulation
                 break;
 
             case 'C':
             case 'c':
-                printf("\nReplaying a previous simulation...\n");
+                printf("\nPrehravam predoslu simulaciu...\n");
                 get_replay_parameters();
                 break;
 
             case 'D':
             case 'd':
-                printf("\nExiting the program. Goodbye!\n");
+                printf("\nKoncim program, AHOJ!\n");
                 exit(0);
 
             default:
-                printf("\nInvalid selection, please try again.\n");
+                printf("\nNeplatna volba, skus to znova.\n");
                 break;
         }
     }
