@@ -137,7 +137,7 @@ void write_to_buffer(const char *data) {
 }
 
 void perform_replications(FILE *file) {
-  	static char *buffer_data;
+  	static char buffer_data[1003];
 
     fprintf(file, "Replication results:\n");
     write_to_buffer("Replication results:\n");
@@ -170,5 +170,4 @@ void perform_replications(FILE *file) {
             }
         }
     }
-    free(buffer_data);
 }
