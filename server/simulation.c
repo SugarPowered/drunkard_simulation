@@ -132,7 +132,7 @@ void write_to_buffer(const char *data) {
         memcpy(&file_buff[current_position], data, data_length);
         current_position += data_length;
     } else {
-        fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
+        //fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
     }
 }
 
