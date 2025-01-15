@@ -9,13 +9,13 @@
 
 void process_client_input(simulation_state_t *state, const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
-        printf("Starting a new simulation...\n");
-        process_client_input_locally(input); // Extract and process parameters for the simulation
+        printf("Startuje sa nova simulacia...\n");
+        process_client_input_locally(input);
     } else if (strncmp(input, "REPLAY_SIMULATION", 17) == 0) {
-        printf("Replaying a previous simulation...\n");
-        reset_simulation(); // Load and handle the replay logic
+        printf("Opatovne spustenie predoslej simulacie...\n");
+        reset_simulation();
     } else {
-        printf("Unknown command: %s\n", input);
+        printf("Neznamy prikaz: %s\n", input);
     }
 }
 
@@ -25,30 +25,29 @@ void *handle_client(void *arg) {
     free(client_data);
 
     char buffer[BUFFER_SIZE];
-    const char *welcome_msg = "Welcome to the Random Walk Simulation Server!\n";
+    const char *welcome_msg = "Vita vas simulacia nahodnej pochodzky.\n";
     write(client_socket, welcome_msg, strlen(welcome_msg));
 
-    simulation_state_t *state = get_simulation_state(); // Get simulation state
+    simulation_state_t *state = get_simulation_state();
 
     while (1) {
         memset(buffer, 0, BUFFER_SIZE);
         int bytes_received = read(client_socket, buffer, BUFFER_SIZE - 1);
 
         if (bytes_received <= 0) {
-            printf("Client disconnected.\n");
+            printf("Klient odpojeny.\n");
             break;
         }
 
-        printf("Received from client: %s\n", buffer);
+        printf("Dorucene od klienta: %s\n", buffer);
 
-        // Process client input
         process_client_input(state, buffer);
 
         const char response[1024];
 		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
-		printf("About to write to client: %s\n", response);
+		printf("Chystam sa dorucit klientovi: %s\n", response);
         int check = write(client_socket, response, strlen(response));
-        printf("Bytes count check: %d\n", check);
+        printf("Check poslanych bytov: %d\n", check);
     }
 
     close(client_socket);
@@ -57,22 +56,21 @@ void *handle_client(void *arg) {
 
 void run_server(int server_socket) {
 
-    printf("Server is running on port %d. Waiting for connections...\n", PORT);
+    printf("Server bezi na porte %d. Cakam na pripojenie...\n", PORT);
 
     while (1) {
         int client_socket = passive_socket_wait_for_client(server_socket);
 
         if (client_socket < 0) {
-            fprintf(stderr, "Failed to accept client connection.\n");
+            fprintf(stderr, "Nepodarilo sa prijat pripojenie od klienta.\n");
             continue;
         }
 
-        printf("Client connected!\n");
+        printf("Klient pripojeny!\n");
 
-        // Allocate memory for client data and spawn a thread
         client_data_t *client_data = malloc(sizeof(client_data_t));
         if (!client_data) {
-            fprintf(stderr, "Failed to allocate memory for client data.\n");
+            fprintf(stderr, "Nepodarilo sa alokovat pamat pre klientove data.\n");
             close(client_socket);
             continue;
         }
@@ -81,13 +79,12 @@ void run_server(int server_socket) {
         pthread_t client_thread;
 
         if (pthread_create(&client_thread, NULL, handle_client, client_data) != 0) {
-            fprintf(stderr, "Failed to create thread for client.\n");
+            fprintf(stderr, "Nepodarilo sa vytvorit vlakno pre klienta.\n");
             free(client_data);
             close(client_socket);
             continue;
         }
 
-        // Detach the thread so resources are released automatically when it finishes
         pthread_detach(client_thread);
     }
 
@@ -97,10 +94,10 @@ void run_server(int server_socket) {
 void initialize_server(int port) {
     int server_socket = passive_socket_init(port);
     if (server_socket < 0) {
-        fprintf(stderr, "Failed to initialize server socket on port %d.\n", port);
+        fprintf(stderr, "Nepodarilo sa inicializovat server socket na porte %d.\n", port);
         exit(EXIT_FAILURE);
     }
 
-    printf("Server initialized on port %d.\n", port);
+    printf("Server inicializovany na porte: %d.\n", port);
     run_server(server_socket);
 }
