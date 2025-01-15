@@ -1,38 +1,31 @@
-//
-// Created by Denis on 27. 12. 2024.
-//
-
 #ifndef SIMULATION_H
 #define SIMULATION_H
 #include <stdbool.h>
 #include <stdio.h>
 
-// Maximum size for simulation world dimensions
 #define MAX_WORLD_SIZE 100
 #define BUFF_DATA_SIZE 1003
 
-// Structure to represent the state of the simulation
 typedef struct {
-    bool in_menu; // True if in menu, false if in simulation mode
-    bool interactive_mode; // True for interactive mode, false for summary mode
+    bool in_menu;
+    bool interactive_mode;
 
-    int world_width; // Width of the world
-    int world_height; // Height of the world
+    int world_width;
+    int world_height;
 
-    int max_steps; // Maximum steps the walker can take
-    int num_replications; // Number of replications
+    int max_steps;
+    int num_replications;
 
-    double move_probabilities[4]; // Probabilities for up, down, left, right (must sum to 1)
+    double move_probabilities[4];
 
-    char results_file[256]; // File name to save results
+    char results_file[256];
 
-    bool obstacles[MAX_WORLD_SIZE][MAX_WORLD_SIZE]; // Grid for obstacles (true = obstacle)
+    bool obstacles[MAX_WORLD_SIZE][MAX_WORLD_SIZE];
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
 static char file_buff[1024] = {0};
 
-// Function prototypes
 void initialize_simulation();
 void reset_simulation();
 void print_simulation_state();

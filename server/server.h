@@ -16,7 +16,6 @@ typedef struct {
     int client_socket;
 } client_data_t;
 
-// server.h
 void initialize_server(int port);
 void *handle_client(void *arg);
 void run_server();
