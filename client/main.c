@@ -1,5 +1,3 @@
-#pragma once
-
 #include "client.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,50 +10,35 @@
 #define BUFFER_SIZE 1024
 
 int main() {
-    // Pripojenie k serveru
-    int socket_fd = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
+    // Initialize the connection once
+    int socket_fd = initialize_connection();
+    if (socket_fd < 0) {
+        // Handle error, exit, etc.
+        return 1;
+    }
 
     char buffer[BUFFER_SIZE];
     char user_input[BUFFER_SIZE];
 
-    printf("Connected to the server. \n");
-
     while (1) {
-        // Prijatie správy od servera
+        // Example usage: send something
+        // send_to_server("Hello server!");
+
+        // Then receive something
         if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
+            // Possibly display menu or do other logic
             display_menu();
         }
 
-        // Získanie vstupu od používateľa - riesi menu tiez
-        // printf("You: ");
-        // if (fgets(user_input, sizeof(user_input), stdin) == NULL) {
-        //     fprintf(stderr, "Error reading input.\n");
-        //     break;
-        // }
-
-        // Odstránenie nového riadku z používateľského vstupu
-        size_t len = strlen(user_input);
-        if (user_input[len - 1] == '\n') {
-            user_input[len - 1] = '\0';
-        }
-
-        // Ak používateľ zadá "exit", ukončíme program
+        // Check for 'exit'
         if (strcmp(user_input, "exit") == 0) {
             printf("Exiting...\n");
             break;
         }
-
-        // !! uz je v menu 1x - Odoslanie používateľského vstupu na server
-        // send_to_server(user_input);
-
-        sleep(10);
-
-        // Cakanie na odozvu od servera, vykreslenie simulacie v terminali
-        if (receive_from_server(socket_fd, buffer, sizeof(buffer)) > 0) {
-            printf("Server: %s\n", buffer);
-            run_renderer(socket_fd);
-        }
+        sleep(1); // Delay for demonstration
     }
 
+    // Explicitly close when we decide
+    close_connection();
     return 0;
 }

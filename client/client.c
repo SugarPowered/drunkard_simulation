@@ -5,33 +5,44 @@
 #include "../sockets-lib/socket.h"
 #include "../server/server.h"
 
-// Funkcia na odoslanie správy na server
-void send_to_server(const char *message) {
-    int sock = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
+// Make the socket global or static so it persists
+static int client_socket = -1;
 
-    if (sock < 0) {
+// Optional: Provide an initialization function to set up the socket
+int initialize_connection() {
+    if (client_socket != -1) {
+        // Already initialized
+        return client_socket;
+    }
+
+    // Connect to the server once and store the result
+    client_socket = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
+    if (client_socket < 0) {
         fprintf(stderr, "Failed to connect to server.\n");
+        return -1;
+    }
+    printf("Successfully connected to server on socket %d.\n", client_socket);
+    return client_socket;
+}
+
+// Function to send data to the server without destroying the connection
+void send_to_server(const char *message) {
+    if (client_socket < 0) {
+        fprintf(stderr, "Invalid socket. Did you call initialize_connection()?\n");
         return;
     }
 
-    if (write(sock, message, strlen(message)) < 0) {
+    if (write(client_socket, message, strlen(message)) < 0) {
         perror("Error sending data to server");
-        active_socket_destroy(sock);
         return;
     }
 
     printf("Message sent to server successfully.\n");
-
-//    char buffer[BUFFER_SIZE];
-//    int bytes_received = receive_from_server(sock, buffer, BUFFER_SIZE);
-
-    active_socket_destroy(sock); // tu sa socket zatvori posledny raz
+    // Notice we do NOT close the socket here
 }
 
-// Funkcia na prijatie odpovede zo servera
+// If you still need a helper to receive messages:
 int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
-
-  	int client_socket = socket_fd;
     memset(buffer, 0, buffer_size);
     int bytes_received = read(socket_fd, buffer, buffer_size - 1);
 
@@ -42,4 +53,13 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
     printf("Message received from server: %s\n", buffer);
 
     return bytes_received;
+}
+
+// Provide a cleanup function to be called explicitly when done
+void close_connection() {
+    if (client_socket >= 0) {
+        printf("Closing connection on socket %d.\n", client_socket);
+        active_socket_destroy(client_socket);
+        client_socket = -1;
+    }
 }
