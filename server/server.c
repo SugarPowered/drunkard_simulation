@@ -45,7 +45,7 @@ void *handle_client(void *arg) {
         process_client_input(state, buffer);
 
         const char response[1024];
-		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", state->results_file);
+		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
 		printf("About to write to client: %s\n", response);
         int check = write(client_socket, response, strlen(response));
         printf("Bytes count check: %d\n", check);
