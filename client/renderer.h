@@ -5,7 +5,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-void render_simulation(const char *simulation_state); // Function to draw the current state of the simulation.
+void render_simulation(const char *simulation_state);
 void clear_world();
 void render_world();
 void update_world_from_server(const char *data);
