@@ -9,6 +9,7 @@
 
 // Maximum size for simulation world dimensions
 #define MAX_WORLD_SIZE 100
+#define BUFF_DATA_SIZE 1003
 
 // Structure to represent the state of the simulation
 typedef struct {

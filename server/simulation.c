@@ -128,7 +128,7 @@ void write_to_buffer(const char *data) {
     static size_t current_position = 0;
 
     size_t data_length = strlen(data);
-    if (current_position + data_length < 1024) {
+    if (current_position + data_length < BUFF_DATA_SIZE) {
         memcpy(&file_buff[current_position], data, data_length);
         current_position += data_length;
     } else {
@@ -137,7 +137,7 @@ void write_to_buffer(const char *data) {
 }
 
 void perform_replications(FILE *file) {
-  	static char buffer_data[1003];
+  	static char buffer_data[BUFF_DATA_SIZE];
 
     fprintf(file, "Replication results:\n");
     write_to_buffer("Replication results:\n");
