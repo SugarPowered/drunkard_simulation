@@ -18,7 +18,6 @@ simulation_state_t global_simulation_state = {
 
 // Initialize the simulation state with socket input values
 void initialize_simulation() {
-
     simulation_state_t state = global_simulation_state;
 
     // Initialize obstacles to false
@@ -125,13 +124,30 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
+void write_to_buffer(const char *data) {
+    static size_t current_position = 0;
+
+    size_t data_length = strlen(data);
+    if (current_position + data_length < 1024) {
+        memcpy(&file_buff[current_position], data, data_length);
+        current_position += data_length;
+    } else {
+        fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
+    }
+}
+
 void perform_replications(FILE *file) {
+  	static char *buffer_data;
+
     fprintf(file, "Replication results:\n");
+    write_to_buffer("Replication results:\n");
     for (int x = 0; x < global_simulation_state.world_width; ++x) {
         for (int y = 0; y < global_simulation_state.world_height; ++y) {
             if (global_simulation_state.obstacles[x][y]) continue;
 
             fprintf(file, "Starting from (%d, %d):\n", x, y);
+            snprintf(buffer_data, sizeof(buffer_data), "Starting from (%d, %d):\n", x, y);
+			write_to_buffer(buffer_data);
 
             // Simulate K steps for each point
             for (int i = 0; i < global_simulation_state.num_replications; ++i) {
@@ -149,7 +165,10 @@ void perform_replications(FILE *file) {
                 }
 
                 fprintf(file, "  Replication %d: %d steps\n", i + 1, steps);
+                snprintf(buffer_data, sizeof(buffer_data), "  Replication %d: %d steps\n", i + 1, steps);
+				write_to_buffer(buffer_data);
             }
         }
     }
+    free(buffer_data);
 }

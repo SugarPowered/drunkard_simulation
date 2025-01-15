@@ -44,7 +44,7 @@ void *handle_client(void *arg) {
         // Process client input
         process_client_input(state, buffer);
 
-        const char response[256];
+        const char response[1024];
 		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", state->results_file);
 		printf("About to write to client: %s\n", response);
         int check = write(client_socket, response, strlen(response));

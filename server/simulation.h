@@ -29,6 +29,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
+static char file_buff[1024] = {0};
 
 // Function prototypes
 void initialize_simulation();
