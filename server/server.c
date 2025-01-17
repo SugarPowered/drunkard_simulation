@@ -7,7 +7,7 @@
 #include "server.h"
 #include "../sockets-lib/socket.h"
 
-void process_client_input(simulation_state_t *state, const char *input) {
+void process_client_input(const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Startuje sa nova simulacia...\n");
         process_client_input_locally(input);
@@ -41,22 +41,26 @@ void *handle_client(void *arg) {
 
         printf("Dorucene od klienta: %s\n", buffer);
 
-        process_client_input(state, buffer);
+        process_client_input(buffer);
 
         char file_content[BUFF_DATA_SIZE] = {0};
         FILE *file = fopen(state->results_file, "r");
         if (file) {
-            fread(file_content, sizeof(char), BUFF_DATA_SIZE, file);
+            size_t bytes_read = fread(file_content, 1, BUFF_DATA_SIZE - 1, file);
+            file_content[bytes_read] = '\0';
             fclose(file);
-        }
 
-        char response[1024 + BUFF_DATA_SIZE];
-		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
-//		printf("Chystam sa dorucit klientovi: %s\n", response);
-        int check = write(client_socket, response, strlen(response));
-        printf("Check poslanych bytov: %d\n", check);
-        if (check > 21) {
-          break;
+			char response[1024 + BUFF_DATA_SIZE] = {0};
+			snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
+			//printf("Chystam sa dorucit klientovi: %s\n", response);
+        	int check = write(client_socket, response, strlen(response));
+        	printf("Check poslanych bytov: %d\n", check);
+        	if (check > 21) {
+          		break;
+        	}
+        } else {
+          	const char *error_msg = "SIMULATION_ERROR: Cannot open results file\n";
+            write(client_socket, error_msg, strlen(error_msg));
         }
     }
 
