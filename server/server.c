@@ -46,7 +46,7 @@ void *handle_client(void *arg) {
         char file_content[BUFF_DATA_SIZE] = {0};
         FILE *file = fopen(state->results_file, "r");
         if (file) {
-            size_t bytes_read = fread(file_content, 1, BUFF_DATA_SIZE - 1, file);
+            size_t bytes_read = fread(file_content, sizeof(char), BUFF_DATA_SIZE - 1, file);
             file_content[bytes_read] = '\0';
             fclose(file);
 
@@ -55,9 +55,7 @@ void *handle_client(void *arg) {
 			//printf("Chystam sa dorucit klientovi: %s\n", response);
         	int check = write(client_socket, response, strlen(response));
         	printf("Check poslanych bytov: %d\n", check);
-        	if (check > 21) {
-          		break;
-        	}
+        	break;
         } else {
           	const char *error_msg = "SIMULATION_ERROR: Cannot open results file\n";
             write(client_socket, error_msg, strlen(error_msg));
