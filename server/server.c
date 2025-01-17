@@ -43,8 +43,15 @@ void *handle_client(void *arg) {
 
         process_client_input(state, buffer);
 
-        const char response[1024];
-		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
+        char file_content[BUFF_DATA_SIZE] = {0};
+        FILE *file = fopen(state->results_file, "r");
+        if (file) {
+            fread(file_content, sizeof(char), BUFF_DATA_SIZE, file);
+            fclose(file);
+        }
+
+        char response[1024 + BUFF_DATA_SIZE];
+		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
 		printf("Chystam sa dorucit klientovi: %s\n", response);
         int check = write(client_socket, response, strlen(response));
         printf("Check poslanych bytov: %d\n", check);
