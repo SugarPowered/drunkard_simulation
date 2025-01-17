@@ -10,7 +10,7 @@
 #include "simulation.h"
 
 #define PORT 13141
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 typedef struct {
     int client_socket;

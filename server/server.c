@@ -51,7 +51,7 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-        char response[1024 + BUFF_DATA_SIZE] = {0};
+        char response[BUFFER_SIZE] = {0};
 		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
 		//printf("Chystam sa dorucit klientovi: %s\n", response);
         int check = write(client_socket, response, strlen(response));

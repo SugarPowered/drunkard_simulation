@@ -6,7 +6,7 @@
 #include "menu.h"
 #include "../sockets-lib/socket.h"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 int main() {
     int socket_fd = initialize_connection();
@@ -29,9 +29,9 @@ int main() {
         if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
             printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
             break;
-        } else {
-            printf("Nespracovana sprava zo servera: %s\n", buffer);
         }
+
+        printf("Nespracovana sprava zo servera: %s\n", buffer);
         display_menu();
     }
     close_connection();
