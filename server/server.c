@@ -52,9 +52,12 @@ void *handle_client(void *arg) {
 
         char response[1024 + BUFF_DATA_SIZE];
 		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
-		printf("Chystam sa dorucit klientovi: %s\n", response);
+//		printf("Chystam sa dorucit klientovi: %s\n", response);
         int check = write(client_socket, response, strlen(response));
         printf("Check poslanych bytov: %d\n", check);
+        if (check > 21) {
+          break;
+        }
     }
 
     close(client_socket);
