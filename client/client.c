@@ -5,8 +5,6 @@
 #include "../sockets-lib/socket.h"
 #include "../server/server.h"
 
-static int client_socket = -1;
-
 // int initialize_connection() {
 //     if (client_socket != -1) {
 //         return client_socket;

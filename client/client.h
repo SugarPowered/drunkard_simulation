@@ -4,6 +4,9 @@
 #include "../sockets-lib/socket.h"
 #include "renderer.h"
 
+extern int client_socket = -1;
+
+
 void send_to_server(const char *message);
 int receive_from_server(int socket, char *buffer, int buffer_size);
 void close_connection();

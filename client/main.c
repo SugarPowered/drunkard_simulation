@@ -72,6 +72,8 @@ int main() {
                 fprintf(stderr, "ERROR: Could not connect to server on port %d.\n", chosen_port);
                 return 1;
             }
+            client_socket = socket_fd;
+
 
             char buffer[BUFFER_SIZE];
             while (1) {
@@ -104,6 +106,8 @@ int main() {
             fprintf(stderr, "ERROR: Could not connect to server on port %d.\n", chosen_port);
             return 1;
         }
+        client_socket = socket_fd;
+
 
         // *** Existing loop ***
         char buffer[BUFFER_SIZE];
