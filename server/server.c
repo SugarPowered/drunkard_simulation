@@ -94,7 +94,7 @@ int run_server_internally_with_fifo(int requested_port, int fifo_fd) {
     int server_socket = create_server_socket(requested_port, &final_port);
 
     // Write the final bound port to the FIFO/pipe
-    if (write(fifo_fd, &final_port, sizeof(final_port)) != -1) {
+    if (write(fifo_fd, &final_port, sizeof(final_port)) == -1) {
         fprintf(stderr, "ERROR: could not write ephemeral port to FIFO.\n");
         // handle or exit
     }

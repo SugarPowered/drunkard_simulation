@@ -26,69 +26,53 @@ int main() {
     int chosen_port = 0;
 
     if (is_host) {
-        // 1) Generate a unique FIFO path
-        // e.g. /tmp/DRUNKARD_5739_1234
+
         srand(time(NULL));
-        int rnd = rand() % 100000;  // or some bigger range
-        pid_t pid_self = getpid();
+        int rnd = rand() % 100000;
+        char pipe[24];
+        snprintf(pipe, sizeof(pipe),
+                 "DRUNKARD_%d_%d_SIM", rnd);
 
-        // We'll store the generated path in fifo_path
-        char fifo_path[256];
-        snprintf(fifo_path, sizeof(fifo_path),
-                 "/tmp/DRUNKARD_%d_%d_SIM", (int)pid_self, rnd);
+        printf("Creating a new pipe %s\n", pipe);
 
-        // 2) Create the named pipe (mkfifo)
-        pipe_init(fifo_path);
+        pipe_init(pipe);
 
-        // 3) Fork the child to run the server
         pid_t cpid = fork();
         if (cpid < 0) {
             perror("Failed to fork server");
-            // If fork fails, clean up the FIFO
-            pipe_destroy(fifo_path);
+            pipe_destroy(pipe);
             return 1;
         }
         else if (cpid == 0) {
-            // === CHILD PROCESS ===
-            // We'll open the FIFO in *write* mode
-            int fd_write = pipe_open_write(fifo_path);
+            int fd_write = pipe_open_write(pipe);
 
-            // Call a special server function that:
-            // - picks a random ephemeral port
-            // - writes that port to fd_write
             run_server_internally_with_fifo(0, fd_write);
 
-            // If we ever return from run_server_internally_with_fifo, close & exit
             pipe_close(fd_write);
             _exit(0);
         }
         else {
-            // === PARENT PROCESS (CLIENT) ===
-            // We'll open the FIFO in *read* mode
-            int fd_read = pipe_open_read(fifo_path);
+            printf("Starting client in 1 second...");
+            sleep(1);
+            int fd_read = pipe_open_read(pipe);
 
-            // Next, we read the chosen ephemeral port from the FIFO
-            if (read(fd_read, &chosen_port, sizeof(chosen_port)) != -1) {
+            if (read(fd_read, &chosen_port, sizeof(chosen_port)) == -1) {
                 fprintf(stderr, "ERROR: Did not receive ephemeral port from child.\n");
-                // handle error
+                exit(EXIT_FAILURE);
             }
             printf("Parent got ephemeral port: %d\n", chosen_port);
 
             pipe_close(fd_read);
-            // Now we can remove (unlink) the FIFO
-            pipe_destroy(fifo_path);
+            pipe_destroy(pipe);
 
-            // Give the child a small time to fully listen (optional)
             sleep(1);
 
-            // 4) Connect to the ephemeral port
             int socket_fd = connect_to_server("127.0.0.1", chosen_port);
             if (socket_fd < 0) {
                 fprintf(stderr, "ERROR: Could not connect to server on port %d.\n", chosen_port);
                 return 1;
             }
 
-            // *** Existing "client main loop" from your code ***
             char buffer[BUFFER_SIZE];
             while (1) {
                 memset(buffer, 0, sizeof(buffer));
