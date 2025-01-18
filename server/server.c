@@ -6,53 +6,6 @@
 #include <unistd.h>
 #include "server.h"
 
-int client_sockets[MAX_CLIENTS] = {0};
-int num_clients = 0;
-pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void cleanup_client(int client_socket) {
-    pthread_mutex_lock(&clients_mutex);
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (client_sockets[i] == client_socket) {
-            client_sockets[i] = 0;
-            if (i == num_clients - 1) num_clients--;
-            break;
-        }
-    }
-    pthread_mutex_unlock(&clients_mutex);
-    close(client_socket);
-}
-
-void cleanup_server() {
-    pthread_mutex_lock(&clients_mutex);
-    for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (client_sockets[i] > 0) {
-            close(client_sockets[i]);
-            client_sockets[i] = 0;
-        }
-    }
-    num_clients = 0;
-    pthread_mutex_unlock(&clients_mutex);
-    pthread_mutex_destroy(&clients_mutex);
-}
-
-int send_to_client(int socket, message_type_t type, const char *data) {
-    protocol_message_t msg = {0};
-    msg.type = type;
-    msg.length = strlen(data);
-    strncpy(msg.data, data, MSG_MAX_SIZE - 1);
-
-    return write(socket, &msg, sizeof(protocol_message_t));
-}
-
-int receive_from_client(int socket, protocol_message_t *msg) {
-    int bytes = read(socket, msg, sizeof(protocol_message_t));
-    if (bytes <= 0) return bytes;
-
-    msg->data[msg->length] = '\0';
-    return bytes;
-}
-
 void process_client_input(const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Startuje sa nova simulacia...\n");
@@ -70,54 +23,41 @@ void *handle_client(void *arg) {
     int client_socket = client_data->client_socket;
     free(client_data);
 
-    send_to_client(client_socket, MSG_WELCOME, "Vita vas simulacia nahodnej pochodzky.\n");
+    char buffer[BUFFER_SIZE];
+    const char *welcome_msg = "Vita vas simulacia nahodnej pochodzky.\n";
+    write(client_socket, welcome_msg, strlen(welcome_msg));
 
     simulation_state_t *state = get_simulation_state();
-    protocol_message_t msg;
 
     while (1) {
-        int bytes_received = receive_from_client(client_socket, &msg);
+        memset(buffer, 0, BUFFER_SIZE);
+        int bytes_received = read(client_socket, buffer, BUFFER_SIZE - 1);
+
         if (bytes_received <= 0) {
             printf("Klient odpojeny.\n");
             break;
         }
 
-        switch (msg.type) {
-            case MSG_START_SIM:
-                printf("Startuje sa nova simulacia...\n");
-                process_client_input_locally(msg.data);
-
-                char file_content[BUFF_DATA_SIZE] = {0};
-                FILE *file = fopen(state->results_file, "r");
-                if (file) {
-                    size_t bytes_read = fread(file_content, sizeof(char), BUFF_DATA_SIZE - 1, file);
-                    file_content[bytes_read] = '\0';
-                    fclose(file);
-                    send_to_client(client_socket, MSG_SIM_COMPLETE, file_content);
-                } else {
-                    send_to_client(client_socket, MSG_ERROR, "Nepodarilo sa nacitat vysledky simulacie.");
-                }
-                break;
-
-            case MSG_REPLAY:
-                printf("Opatovne spustenie predoslej simulacie...\n");
-                reset_simulation();
-                break;
-
-            case MSG_DISCONNECT:
-                printf("Klient poziadal o odpojenie.\n");
-                goto cleanup;
-
-            default:
-                printf("Neznamy prikaz.\n");
-                send_to_client(client_socket, MSG_ERROR, "Neznamy prikaz.");
-                break;
+        printf("Dorucene od klienta: %s\n", buffer);
+        process_client_input(buffer);
+        char file_content[BUFF_DATA_SIZE] = {0};
+        FILE *file = fopen(state->results_file, "r");
+        if (file) {
+            size_t bytes_read = fread(file_content, sizeof(char), BUFF_DATA_SIZE - 1, file);
+            file_content[bytes_read] = '\0';
+            fclose(file);
         }
+
+        char response[BUFFER_SIZE] = {0};
+		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_content);
+		//printf("Chystam sa dorucit klientovi: %s\n", response);
+        int check = write(client_socket, response, strlen(response));
+        printf("Check poslanych bytov: %d\n", check);
+        break;
     }
 
-	cleanup:
-    	close(client_socket);
-    	return NULL;
+ 	close(client_socket);
+    return NULL;
 }
 
 void run_server(int server_socket) {
