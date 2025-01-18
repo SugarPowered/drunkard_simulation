@@ -121,11 +121,7 @@ void initialize_server(int requested_port) {
     run_server(server_socket);
 }
 
-/**
- * The rest of your server code: run_server, handle_client, etc.
- */
-
-void process_client_input(simulation_state_t *state, const char *input) {
+void process_client_input(const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Startuje sa nova simulacia...\n");
         process_client_input_locally(input);
@@ -158,17 +154,27 @@ void *handle_client(void *arg) {
         }
 
         printf("Dorucene od klienta: %s\n", buffer);
+        process_client_input(buffer);
+        char file_content[BUFF_DATA_SIZE] = {0};
+        FILE *file = fopen(state->results_file, "r");
+        if (file) {
+            size_t bytes_read = fread(file_content, sizeof(char), BUFF_DATA_SIZE - 1, file);
+            file_content[bytes_read] = '\0';
+            fclose(file);
+        }
 
         process_client_input(state, buffer);
 
         char response[1024];
         snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
         printf("Chystam sa dorucit klientovi: %s\n", response);
+
         int check = write(client_socket, response, strlen(response));
         printf("Check poslanych bytov: %d\n", check);
+        break;
     }
 
-    close(client_socket);
+ 	close(client_socket);
     return NULL;
 }
 

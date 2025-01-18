@@ -38,14 +38,16 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
     memset(buffer, 0, buffer_size);
     int bytes_received = read(socket_fd, buffer, buffer_size - 1);
 
-    if (bytes_received < 0) {
+    if (bytes_received <= 0) {
         perror("Zlyhalo prijatie spravy zo servera");
         return -1;
     }
-    printf("Prijata sprava zo servera: %s\n", buffer);
 
+    printf("Prijata sprava zo servera: %s\n", buffer);
     return bytes_received;
 }
+
+
 
 void close_connection() {
     if (client_socket >= 0) {

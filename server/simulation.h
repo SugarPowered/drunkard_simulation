@@ -2,6 +2,7 @@
 #define SIMULATION_H
 #include <stdbool.h>
 #include <stdio.h>
+#include "server.h"
 
 #define MAX_WORLD_SIZE 100
 #define BUFF_DATA_SIZE 1003
@@ -24,7 +25,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
-static char file_buff[1024] = {0};
+// static char file_buff[2048] = {0};
 
 void initialize_simulation();
 void reset_simulation();
