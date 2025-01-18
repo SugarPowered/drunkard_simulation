@@ -20,7 +20,8 @@ static int ask_user_for_mode() {
     return 0;
 }
 
-void sim_loop(char * buffer, int socket_fd) {
+void sim_loop(int socket_fd) {
+    char buffer[BUFFER_SIZE];
     while (1) {
         memset(buffer, 0, sizeof(buffer));
 
@@ -93,10 +94,7 @@ int main() {
             }
             client_socket = socket_fd;
 
-
-            char buffer[BUFFER_SIZE];
-
-            sim_loop(buffer, socket_fd);
+            sim_loop(socket_fd);
 
             close_connection();
         }
@@ -112,9 +110,8 @@ int main() {
         }
         client_socket = socket_fd;
 
+        sim_loop(socket_fd);
 
-        char buffer[BUFFER_SIZE];
-        sim_loop(buffer, socket_fd);
         close_connection();
     }
     return 0;
