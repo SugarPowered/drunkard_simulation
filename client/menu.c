@@ -9,6 +9,8 @@
 #include "client.h"
 #include "../sockets-lib/socket.h"
 
+int menu_rendered = 0;
+
 void print_ascii_menu_screen() {
     printf("==========================================================\n");
     printf("          __  _               _         __               \n");
@@ -89,8 +91,9 @@ void display_menu() {
     char input;
     print_ascii_menu_screen();
     printf("Prosim zvol moznost: ");
-
-    while (scanf(" %c", &input)) {
+    scanf(" %c", &input);
+    while (menu_rendered == 0) {
+        menu_rendered = 1;
         switch (input) {
             case 'A':
             case 'a':

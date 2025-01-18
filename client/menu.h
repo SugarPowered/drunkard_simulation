@@ -2,6 +2,7 @@
 #define MENU_C
 
 #include "../server/simulation.h"
+extern int menu_rendered;
 
 void get_simulation_parameters();
 void get_replay_parameters();
