@@ -1,11 +1,129 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include "server.h"
-#include "../sockets-lib/socket.h"
+
+/**
+ * Helper: pick_random_port
+ * Picks a random port in [min_port .. max_port].
+ */
+static int pick_random_port(int min_port, int max_port) {
+    return min_port + rand() % (max_port - min_port + 1);
+}
+
+/**
+ * create_server_socket:
+ *    - If requested_port != 0, tries passive_socket_init(requested_port).
+ *    - If requested_port == 0, picks random ports in [49152..65535] until it succeeds (or fails after N tries).
+ *    - Returns the socket FD on success.
+ *    - Stores the final port in *final_port_out.
+ *    - Exits on fatal error.
+ */
+static int create_server_socket(int requested_port, int *final_port_out) {
+    if (!final_port_out) {
+        fprintf(stderr, "create_server_socket called with NULL final_port_out!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // For safer random seeding, if you haven't seeded yet
+    srand((unsigned)time(NULL));
+
+    int server_socket = -1;
+    int attempts = 100;
+
+    if (requested_port != 0) {
+        // Try the user-specified port once
+        server_socket = passive_socket_init(requested_port);
+        if (server_socket < 0) {
+            fprintf(stderr, "Failed to bind to port %d.\n", requested_port);
+            exit(EXIT_FAILURE);
+        }
+        *final_port_out = requested_port;
+        printf("create_server_socket: Bound to fixed port %d\n", requested_port);
+    } else {
+        // Manual ephemeral approach: pick random from [49152..65535]
+        const int min_port = 49152;
+        const int max_port = 65535;
+        while (attempts--) {
+            int rport = pick_random_port(min_port, max_port);
+            server_socket = passive_socket_init(rport);
+            if (server_socket >= 0) {
+                *final_port_out = rport;
+                printf("create_server_socket: Bound to random port %d\n", rport);
+                break;
+            }
+        }
+        if (server_socket < 0) {
+            fprintf(stderr, "Failed to find free random port after many attempts.\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    return server_socket;
+}
+
+/**
+ * run_server_internally:
+ *   - Creates/binds a server socket (random or fixed port).
+ *   - Calls run_server(...) which typically loops forever.
+ *   - Also calls initialize_simulation() first (if you want).
+ */
+int run_server_internally(int requested_port) {
+    simulation_state_t *state = get_simulation_state();
+
+    int final_port = 0;
+    int server_socket = create_server_socket(requested_port, &final_port);
+
+    // If you want your simulation logic started now:
+    initialize_simulation();
+
+    // Then block, accepting clients:
+    run_server(server_socket);
+
+    return 0; // Typically never reached
+}
+
+/**
+ * run_server_internally_with_fifo:
+ *   - Same as run_server_internally, but writes the chosen port to 'fifo_fd'
+ *     so the *other side* knows which port was bound.
+ */
+int run_server_internally_with_fifo(int requested_port, int fifo_fd) {
+    simulation_state_t *state = get_simulation_state();
+
+    int final_port = 0;
+    int server_socket = create_server_socket(requested_port, &final_port);
+
+    // Write the final bound port to the FIFO/pipe
+    if (write(fifo_fd, &final_port, sizeof(final_port)) != -1) {
+        fprintf(stderr, "ERROR: could not write ephemeral port to FIFO.\n");
+        // handle or exit
+    }
+    close(fifo_fd); // done writing
+
+    // Start the simulation if needed
+    initialize_simulation();
+
+    run_server(server_socket);
+
+    return 0; // never reached
+}
+
+/**
+ * If you want to keep the old 'initialize_server' function for compatibility:
+ */
+void initialize_server(int requested_port) {
+    // Old style: just create & bind, then call run_server
+    int final_port = 0;
+    int server_socket = create_server_socket(requested_port, &final_port);
+
+    printf("initialize_server: Actually bound on port %d\n", final_port);
+
+    run_server(server_socket);
+}
+
+/**
+ * The rest of your server code: run_server, handle_client, etc.
+ */
 
 void process_client_input(simulation_state_t *state, const char *input) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
@@ -43,9 +161,9 @@ void *handle_client(void *arg) {
 
         process_client_input(state, buffer);
 
-        const char response[1024];
-		snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
-		printf("Chystam sa dorucit klientovi: %s\n", response);
+        char response[1024];
+        snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
+        printf("Chystam sa dorucit klientovi: %s\n", response);
         int check = write(client_socket, response, strlen(response));
         printf("Check poslanych bytov: %d\n", check);
     }
@@ -55,12 +173,10 @@ void *handle_client(void *arg) {
 }
 
 void run_server(int server_socket) {
-
-    printf("Server bezi na porte %d. Cakam na pripojenie...\n", PORT);
+    printf("Server is running. Waiting for connections...\n");
 
     while (1) {
         int client_socket = passive_socket_wait_for_client(server_socket);
-
         if (client_socket < 0) {
             fprintf(stderr, "Nepodarilo sa prijat pripojenie od klienta.\n");
             continue;
@@ -84,52 +200,9 @@ void run_server(int server_socket) {
             close(client_socket);
             continue;
         }
-
+        // Detach so we don't wait on them
         pthread_detach(client_thread);
     }
 
     passive_socket_destroy(server_socket);
-}
-
-static int pick_random_port(int min_port, int max_port) {
-    // Simple random port from [min_port, max_port]
-    return min_port + rand() % (max_port - min_port + 1);
-}
-
-void initialize_server(int requested_port) {
-    // If requested_port == 0, we will pick a random free port from e.g. 49152..65535
-    // (the standard ephemeral range)
-    // You could also just rely on the OS ephemeral port by letting port=0 in the bind,
-    // but this snippet does it manually.
-    int port_to_try = requested_port;
-    if (port_to_try == 0) {
-        // Example ephemeral range:
-        int min_port = 49152;
-        int max_port = 65535;
-
-        // Try up to e.g. 100 random attempts:
-        int attempts = 100;
-        int server_socket;
-        while (attempts--) {
-            port_to_try = pick_random_port(min_port, max_port);
-            server_socket = passive_socket_init(port_to_try);
-            if (server_socket >= 0) {
-                // Success binding
-                printf("Server initialized on random port: %d\n", port_to_try);
-                run_server(server_socket);
-                return;
-            }
-        }
-        fprintf(stderr, "Failed to find a free port after 100 attempts.\n");
-        exit(EXIT_FAILURE);
-    } else {
-        // The user specifically requested a port
-        int server_socket = passive_socket_init(port_to_try);
-        if (server_socket < 0) {
-            fprintf(stderr, "Failed to initialize server socket on port %d.\n", port_to_try);
-            exit(EXIT_FAILURE);
-        }
-        printf("Server initialized on port: %d\n", port_to_try);
-        run_server(server_socket);
-    }
 }
