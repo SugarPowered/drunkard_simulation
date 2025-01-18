@@ -26,7 +26,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
-static char file_buff[2048] = {0};
+// static char file_buff[2048] = {0};
 
 void initialize_simulation();
 void reset_simulation();

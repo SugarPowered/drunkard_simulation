@@ -5,8 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "server.h"
-#include "../common/protocol.h"
-#include "../sockets-lib/socket.h"
 
 int client_sockets[MAX_CLIENTS] = {0};
 int num_clients = 0;

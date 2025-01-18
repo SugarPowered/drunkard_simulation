@@ -106,30 +106,30 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
-void write_to_buffer(const char *data) {
-    static size_t current_position = 0;
-
-    size_t data_length = strlen(data);
-    if (current_position + data_length < BUFF_DATA_SIZE) {
-        memcpy(&file_buff[current_position], data, data_length);
-        current_position += data_length;
-    } else {
-        //fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
-    }
-}
+//void write_to_buffer(const char *data) {
+//    static size_t current_position = 0;
+//
+//    size_t data_length = strlen(data);
+//    if (current_position + data_length < BUFF_DATA_SIZE) {
+//        memcpy(&file_buff[current_position], data, data_length);
+//        current_position += data_length;
+//    } else {
+//        //fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
+//    }
+//}
 
 void perform_replications(FILE *file) {
   	static char buffer_data[BUFF_DATA_SIZE];
 
     fprintf(file, "Výsledky replikácie:\n");
-    write_to_buffer("Výsledky replikácie:\n");
+//    write_to_buffer("Výsledky replikácie:\n");
     for (int x = 0; x < global_simulation_state.world_width; ++x) {
         for (int y = 0; y < global_simulation_state.world_height; ++y) {
             if (global_simulation_state.obstacles[x][y]) continue;
 
             fprintf(file, "Začiatok z (%d, %d):\n", x, y);
             snprintf(buffer_data, sizeof(buffer_data), "Začiatok z (%d, %d):\n", x, y);
-			write_to_buffer(buffer_data);
+//			write_to_buffer(buffer_data);
 
             for (int i = 0; i < global_simulation_state.num_replications; ++i) {
                 int steps = 0;
@@ -147,7 +147,7 @@ void perform_replications(FILE *file) {
 
                 fprintf(file, "  Replikácia %d: krok %d \n", i + 1, steps);
                 snprintf(buffer_data, sizeof(buffer_data), "  Replikácia %d: krok %d \n", i + 1, steps);
-				write_to_buffer(buffer_data);
+//				write_to_buffer(buffer_data);
 
                 if (global_simulation_state.interactive_mode) {
                     pthread_mutex_lock(&clients_mutex);

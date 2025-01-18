@@ -6,8 +6,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
-#include "../sockets-lib/socket.h"
 #include "simulation.h"
+
+#include "../sockets-lib/socket.h"
+#include "../common/protocol.h"
 
 #define PORT 13141
 #define BUFFER_SIZE 2048
