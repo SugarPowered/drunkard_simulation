@@ -91,13 +91,45 @@ void run_server(int server_socket) {
     passive_socket_destroy(server_socket);
 }
 
-void initialize_server(int port) {
-    int server_socket = passive_socket_init(port);
-    if (server_socket < 0) {
-        fprintf(stderr, "Nepodarilo sa inicializovat server socket na porte %d.\n", port);
-        exit(EXIT_FAILURE);
-    }
+static int pick_random_port(int min_port, int max_port) {
+    // Simple random port from [min_port, max_port]
+    return min_port + rand() % (max_port - min_port + 1);
+}
 
-    printf("Server inicializovany na porte: %d.\n", port);
-    run_server(server_socket);
+void initialize_server(int requested_port) {
+    // If requested_port == 0, we will pick a random free port from e.g. 49152..65535
+    // (the standard ephemeral range)
+    // You could also just rely on the OS ephemeral port by letting port=0 in the bind,
+    // but this snippet does it manually.
+    int port_to_try = requested_port;
+    if (port_to_try == 0) {
+        // Example ephemeral range:
+        int min_port = 49152;
+        int max_port = 65535;
+
+        // Try up to e.g. 100 random attempts:
+        int attempts = 100;
+        int server_socket;
+        while (attempts--) {
+            port_to_try = pick_random_port(min_port, max_port);
+            server_socket = passive_socket_init(port_to_try);
+            if (server_socket >= 0) {
+                // Success binding
+                printf("Server initialized on random port: %d\n", port_to_try);
+                run_server(server_socket);
+                return;
+            }
+        }
+        fprintf(stderr, "Failed to find a free port after 100 attempts.\n");
+        exit(EXIT_FAILURE);
+    } else {
+        // The user specifically requested a port
+        int server_socket = passive_socket_init(port_to_try);
+        if (server_socket < 0) {
+            fprintf(stderr, "Failed to initialize server socket on port %d.\n", port_to_try);
+            exit(EXIT_FAILURE);
+        }
+        printf("Server initialized on port: %d\n", port_to_try);
+        run_server(server_socket);
+    }
 }

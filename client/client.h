@@ -4,7 +4,6 @@
 #include "../sockets-lib/socket.h"
 #include "renderer.h"
 
-#define SERVER_PORT 13141
 #define SERVER_ADDRESS "127.0.0.1"
 
 int initialize_connection();
