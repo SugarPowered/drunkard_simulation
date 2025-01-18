@@ -20,6 +20,26 @@ static int ask_user_for_mode() {
     return 0;
 }
 
+void sim_loop(char buffer, int socket_fd) {
+    while (1) {
+        memset(buffer, 0, sizeof(buffer));
+
+        int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
+        if (bytes_received <= 0) {
+            printf("Server disconnected or error.\n");
+            break;
+        }
+
+        if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
+            printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
+            break;
+        }
+
+        printf("Nespracovana sprava zo servera: %s\n", buffer);
+        display_menu();
+    }
+}
+
 int main() {
     int is_host = ask_user_for_mode();
     int chosen_port = 0;
@@ -75,28 +95,13 @@ int main() {
 
 
             char buffer[BUFFER_SIZE];
-            while (1) {
-                memset(buffer, 0, sizeof(buffer));
 
-                int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
-                if (bytes_received <= 0) {
-                    printf("Server disconnected or error.\n");
-                    break;
-                }
+            sim_loop(buffer, socket_fd);
 
-                if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
-                    printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
-                    break;
-                }
-
-                printf("Nespracovana sprava zo servera: %s\n", buffer);
-                display_menu();
-            }
             close_connection();
         }
     }
     else {
-        // === JOIN existing server mode ===
         printf("Enter the server port to connect: ");
         scanf("%d", &chosen_port);
 
@@ -108,23 +113,8 @@ int main() {
         client_socket = socket_fd;
 
 
-        // *** Existing loop ***
         char buffer[BUFFER_SIZE];
-        while (1) {
-            memset(buffer, 0, sizeof(buffer));
-            int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
-            if (bytes_received <= 0) {
-                printf("Server disconnected or error.\n");
-                break;
-            }
-
-            if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
-                printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
-                break;
-            }
-            printf("Nespracovana sprava zo servera: %s\n", buffer);
-            display_menu();
-        }
+        sim_loop(buffer, socket_fd);
         close_connection();
     }
     return 0;

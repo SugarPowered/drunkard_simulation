@@ -6,9 +6,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "simulation.h"
 #include "../sockets-lib/socket.h"
 #include "../pipe-lib/pipe.h"
-#include "simulation.h"
 
 #define BUFFER_SIZE 1024
 
