@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simulation.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -56,6 +57,12 @@ void print_simulation_state() {
            global_simulation_state.move_probabilities[0], global_simulation_state.move_probabilities[1],
            global_simulation_state.move_probabilities[2], global_simulation_state.move_probabilities[3]);
     printf("  Subor vysledkov: %s\n", global_simulation_state.results_file);
+}
+
+void send_simulation_update(int client_socket, int x, int y, int steps) {
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "UPDATE %d %d %d", x, y, steps);
+    send_to_client(client_socket, MSG_SIM_UPDATE, buffer);
 }
 
 void process_client_input_locally(const char *input) {
@@ -141,6 +148,16 @@ void perform_replications(FILE *file) {
                 fprintf(file, "  Replikácia %d: krok %d \n", i + 1, steps);
                 snprintf(buffer_data, sizeof(buffer_data), "  Replikácia %d: krok %d \n", i + 1, steps);
 				write_to_buffer(buffer_data);
+
+                if (global_simulation_state.interactive_mode) {
+                    pthread_mutex_lock(&clients_mutex);
+                    for (int j = 0; j < num_clients; j++) {
+                        if (client_sockets[i] > 0) {
+                            send_simulation_update(client_sockets[j], x, y, steps);
+                        }
+                    }
+                    pthread_mutex_unlock(&clients_mutex);
+                }
             }
         }
     }

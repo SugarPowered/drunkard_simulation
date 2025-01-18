@@ -11,11 +11,19 @@
 
 #define PORT 13141
 #define BUFFER_SIZE 2048
+#define MAX_CLIENTS 10
+
+extern int client_sockets[MAX_CLIENTS];
+extern int num_clients;
+extern pthread_mutex_t clients_mutex;
 
 typedef struct {
     int client_socket;
 } client_data_t;
 
+void cleanup_client(int client_socket);
+void cleanup_server();
+int send_to_client(int socket, message_type_t type, const char *data);
 void initialize_server(int port);
 void *handle_client(void *arg);
 void run_server();
