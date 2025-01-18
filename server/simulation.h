@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "server.h"
-#include "../common/protocol.h"
 
 #define MAX_WORLD_SIZE 100
 #define BUFF_DATA_SIZE 1003
