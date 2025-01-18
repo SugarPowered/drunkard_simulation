@@ -14,7 +14,7 @@
 // Prompts user (H)ost or (J)oin?
 static int ask_user_for_mode() {
     char choice;
-    printf("\nWould you like to host a new server (H) or join an existing server (J)? ");
+    printf("\nWould you like to host a new server (H) or join an existing server (J)?");
     scanf(" %c", &choice);
     if (choice == 'H' || choice == 'h') return 1;
     return 0;
@@ -30,7 +30,7 @@ int main() {
         int rnd = rand() % 100000;
         char pipe[24];
         snprintf(pipe, sizeof(pipe),
-                 "DRUNKARD_%d_%d_SIM", rnd);
+                 "DRUNKARD_%d_SIM", rnd);
 
         printf("Creating a new pipe %s\n", pipe);
 
@@ -38,7 +38,7 @@ int main() {
 
         pid_t cpid = fork();
         if (cpid < 0) {
-            perror("Failed to fork server");
+            perror("Failed to fork server\n");
             pipe_destroy(pipe);
             return 1;
         }
@@ -51,7 +51,7 @@ int main() {
             _exit(0);
         }
         else {
-            printf("Starting client in 1 second...");
+            printf("Starting client in 1 second...\n");
             sleep(1);
             int fd_read = pipe_open_read(pipe);
 

@@ -87,12 +87,10 @@ void get_replay_parameters() {
 
 void display_menu() {
     char input;
+    print_ascii_menu_screen();
+    printf("Prosim zvol moznost: ");
 
-    while (1) {
-        print_ascii_menu_screen();
-        printf("Prosim zvol moznost: ");
-        scanf(" %c", &input);
-
+    while (scanf(" %c", &input)) {
         switch (input) {
             case 'A':
             case 'a':
@@ -123,8 +121,4 @@ void display_menu() {
                 break;
         }
     }
-}
-
-void initialize_menu() {
-    display_menu();
 }
