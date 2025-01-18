@@ -13,11 +13,16 @@ simulation_state_t global_simulation_state = {
     .move_probabilities = {0},
     .max_steps = 0,
     .results_file = "",
-    .in_menu = false,
+    .in_menu = true,
     .interactive_mode = false
 };
 
 void initialize_simulation() {
+    if (global_simulation_state.in_menu) {
+        printf("Sim State is in menu!\n");
+        return;
+    }
+
     simulation_state_t state = global_simulation_state;
 
     for (int i = 0; i < MAX_WORLD_SIZE; ++i) {

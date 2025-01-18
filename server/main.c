@@ -6,7 +6,7 @@
 int main() {
     simulation_state_t *state = get_simulation_state();
 
-    initialize_server(PORT);
+    initialize_server(0);
 
     initialize_simulation();
     return 0;

@@ -9,6 +9,8 @@
 #include "client.h"
 #include "../sockets-lib/socket.h"
 
+int menu_rendered = 0;
+
 void print_ascii_menu_screen() {
     printf("==========================================================\n");
     printf("          __  _               _         __               \n");
@@ -87,12 +89,11 @@ void get_replay_parameters() {
 
 void display_menu() {
     char input;
-
-    while (1) {
-        print_ascii_menu_screen();
-        printf("Prosim zvol moznost: ");
-        scanf(" %c", &input);
-
+    print_ascii_menu_screen();
+    printf("Prosim zvol moznost: ");
+    scanf(" %c", &input);
+    while (menu_rendered == 0) {
+        menu_rendered = 1;
         switch (input) {
             case 'A':
             case 'a':
@@ -123,8 +124,4 @@ void display_menu() {
                 break;
         }
     }
-}
-
-void initialize_menu() {
-    display_menu();
 }
