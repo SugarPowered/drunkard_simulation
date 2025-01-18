@@ -9,3 +9,4 @@ LANGUAGES C
 add_subdirectory(client)
 add_subdirectory(server)
 add_subdirectory(sockets-lib)
+add_subdirectory(common)
