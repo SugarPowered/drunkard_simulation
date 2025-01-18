@@ -163,7 +163,7 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-        process_client_input(state, buffer);
+        process_client_input(buffer);
 
         char response[1024];
         snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
