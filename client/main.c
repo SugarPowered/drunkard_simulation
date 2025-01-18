@@ -20,7 +20,7 @@ static int ask_user_for_mode() {
     return 0;
 }
 
-void sim_loop(char buffer, int socket_fd) {
+void sim_loop(char * buffer, int socket_fd) {
     while (1) {
         memset(buffer, 0, sizeof(buffer));
 
