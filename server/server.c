@@ -37,7 +37,7 @@ void cleanup_server() {
 }
 
 int send_to_client(int socket, message_type_t type, const char *data) {
-    protocol_message_t msg;
+    protocol_message_t msg = {0};
     msg.type = type;
     msg.length = strlen(data);
     strncpy(msg.data, data, MSG_MAX_SIZE - 1);

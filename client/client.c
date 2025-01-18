@@ -8,7 +8,7 @@
 static int client_socket = -1;
 
 int send_message(int socket, message_type_t type, const char *data) {
-    protocol_message_t msg;
+    protocol_message_t msg = {0};
     msg.type = type;
     msg.length = strlen(data);
     strncpy(msg.data, data, MSG_MAX_SIZE - 1);
@@ -51,6 +51,7 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
       	case MSG_WELCOME:
           	printf("%s", msg.data);
             break;
+
         case MSG_SIM_COMPLETE:
             strncpy(buffer, msg.data, buffer_size - 1);
             printf("Simulacia dokoncena.\n");
