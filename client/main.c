@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <time.h>      // for srand/time
-#include <sys/types.h> // for pid_t
+#include <time.h>
 #include "../server/server.h"
 #include "../sockets-lib/socket.h"
 #include "../pipe-lib/pipe.h"

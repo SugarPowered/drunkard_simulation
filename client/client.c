@@ -18,6 +18,7 @@
 //     printf("Uspesne pripojeny k socketu %d.\n", client_socket);
 //     return client_socket;
 // }
+int client_socket = -1;
 
 void send_to_server(const char *message) {
     if (client_socket < 0) {
