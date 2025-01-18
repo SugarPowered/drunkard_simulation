@@ -48,6 +48,9 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
     }
 
     switch (msg.type) {
+      	case MSG_WELCOME:
+          	printf("%s", msg.data);
+            break;
         case MSG_SIM_COMPLETE:
             strncpy(buffer, msg.data, buffer_size - 1);
             printf("Simulacia dokoncena.\n");
