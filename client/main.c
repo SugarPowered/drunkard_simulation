@@ -20,21 +20,17 @@ void handle_server_message(const char *msg) {
     // First token might be "INFO"
     char *token = strtok(copy, "|");
     if (!token) return;
-    printf("[TOKEN1]%s\n", token);
 
     // Second token might be "MENU"
     token = strtok(NULL, "|");
     if (!token) return;
 
-    printf("[TOKEN2]%s\n", token);
     int comp_result = strcmp(token, "MENU");
     if (comp_result == 0) {
-        // Now call our local function to display the menu
         display_menu();
     } else {
         printf("[SERVER->CLIENT]%s\n", msg);
     }
-    // else if ... handle other states like ONGOING_SIM, FINISHED_SIM, etc.
 }
 
 // Prompts user (H)ost or (J)oin?
