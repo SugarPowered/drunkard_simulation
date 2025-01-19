@@ -71,7 +71,6 @@ void initialize_simulation() {
         }
     }
 
-    // Fill each cell
     for (int i = 0; i < global_simulation_state.world_height; i++) {
         for (int j = 0; j < global_simulation_state.world_width; j++) {
             if (i == global_simulation_state.world_height / 2 && j == global_simulation_state.world_width / 2) {
@@ -166,6 +165,18 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
+void reset_world() {
+  for (int i = 0; i < global_simulation_state.world_height; i++) {
+        for (int j = 0; j < global_simulation_state.world_width; j++) {
+            if (i == global_simulation_state.world_height / 2 && j == global_simulation_state.world_width / 2) {
+                global_simulation_state.world[i][j] = CENTER_WORLD;
+            } else {
+                global_simulation_state.world[i][j] = SPACE;
+            }
+        }
+  }
+}
+
 void print_world() {
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
@@ -241,11 +252,13 @@ void execute_simulation(FILE *file) {
             if(center_x == new_x && center_y == new_y) {
               global_simulation_state.world[new_x][new_y] = WALKER;
               print_world();
+              reset_world();
               break;
             }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
         print_world();
+        reset_world();
       }
     }
   }
