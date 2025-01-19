@@ -27,27 +27,25 @@ simulation_state_t global_simulation_state = {
 ////    update_world_summary(state);
 //  }
 //}
-//
-//void place_obstacle(simulation_state_t *state) {
-//  int center_x = state->world_width / 2;
-//  int center_y = state->world_height / 2;
-//
-//  for (int i = 0; i < state->obstacles_count; i++) {
-//    int x, y;
-//
-//    do {
-//      x = rand() % state->world_width;
-//      y = rand() % state->world_height;
-//    } while ((x == center_x && y == center_y) || strcmp(state->world[x][y], OBSTACLE) == 0 || strcmp(state->world[x][y], WALKER) == 0);
-//    state->world[x][y] = OBSTACLE;
-//  }
-//
-//  update_world(state);
-//}
 
+void place_obstacle(simulation_state_t *state) {
+  int center_x = state->world_width / 2;
+  int center_y = state->world_height / 2;
+
+  for (int i = 0; i < state->obstacles_count; i++) {
+    int x, y;
+
+    do {
+      x = rand() % state->world_width;
+      y = rand() % state->world_height;
+    } while ((x == center_x && y == center_y) || strcmp(state->world[x][y], OBSTACLE) == 0 || strcmp(state->world[x][y], WALKER) == 0);
+    state->world[x][y] = OBSTACLE;
+  }
+
+  //update_world(state);
+}
 
 void initialize_simulation() {
-    // If the global state says we're in the menu, skip
     if (global_simulation_state.in_menu) {
         printf("Sim State is in menu!\n");
         return;
@@ -55,12 +53,10 @@ void initialize_simulation() {
 
     printf("[SERVER] Initializing simulation...\n");
 
-    // We’re operating directly on the global struct
     global_simulation_state.obstacles_count = (int)(
         global_simulation_state.world_width * global_simulation_state.world_height * 0.2
     );
 
-    // Allocate rows
     global_simulation_state.world = malloc(global_simulation_state.world_height * sizeof(char**));
     if (!global_simulation_state.world) {
         perror("malloc world");
@@ -83,10 +79,11 @@ void initialize_simulation() {
             } else {
                 global_simulation_state.world[i][j] = SPACE;
             }
+
         }
     }
 
-    // Now this call uses global_simulation_state.world, which is allocated properly
+    place_obstacle(&global_simulation_state);
     print_world();
 
     FILE *result_file = fopen(global_simulation_state.results_file, "w");
