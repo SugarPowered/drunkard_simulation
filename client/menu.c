@@ -61,10 +61,10 @@ void get_simulation_parameters() {
     printf("\nVloz maximalny pocet krokov (K): ");
     scanf("%d", &max_steps);
 
-    printf("\nChces svet s prekazkami? 1 - ano, 0 - nie");
+    printf("\nChces svet s prekazkami? 1 - ano, 0 - nie : ");
     scanf("%d", &has_obstacles);
 
-    printf("\nAky chces mod? 1 - interaktivny, 0 - sumarny");
+    printf("\nAky chces mod? 1 - interaktivny, 0 - sumarny : ");
     scanf("%d", &is_interactive);
 
     printf("\nVloz nazov vystupneho suboru: ");

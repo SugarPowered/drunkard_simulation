@@ -55,24 +55,10 @@ void initialize_simulation() {
     simulation_state_t state = global_simulation_state;
     state.obstacles_count = (int)(state.world_width * state.world_height) * (0.2);
 
-    state.world = malloc(state.world_height * sizeof(char*));
-    if (state.world == NULL) {
-        perror("Failed to allocate memory for rows");
-        return;
-    }
-
-    for (int i = 0; i < state.world_height; i++) {
-        state.world[i] = malloc(state.world_width * sizeof(char));
-        if (state.world[i] == NULL) {
-            perror("Failed to allocate memory for a row");
-
-            for (int j = 0; j < i; j++) {
-                free(state.world[j]);
-            }
-            free(state.world);
-            return;
-        }
-    }
+    state.world = malloc(state.world_height * sizeof(char**));
+	for (int i = 0; i < state.world_height; i++) {
+    	state.world[i] = malloc(state.world_width * sizeof(char*));
+	}
 
     for (int i = 0; i < state.world_height; i++) {
         for (int j = 0; j < state.world_width; j++) {
@@ -98,6 +84,12 @@ void initialize_simulation() {
     fclose(result_file);
     printf("Vysledky ulozene do %s.\n", global_simulation_state.results_file);
     print_simulation_state();
+
+//    for (int i = 0; i < state.world_height; i++) {
+//    	free(state.world[i]);
+//	}
+//	free(state.world);
+
     return;
 }
 
