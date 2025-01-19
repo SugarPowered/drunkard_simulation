@@ -87,8 +87,6 @@ void initialize_simulation() {
       place_obstacle(&global_simulation_state);
     }
 
-    print_world();
-
     FILE *result_file = fopen(global_simulation_state.results_file, "w");
     if (!result_file) {
         fprintf(stderr, "Neuspesne otvorenie vysledkoveho suboru.\n");
@@ -100,7 +98,7 @@ void initialize_simulation() {
     fclose(result_file);
 
     printf("Vysledky ulozene do %s.\n", global_simulation_state.results_file);
-    print_simulation_state();
+//    print_simulation_state();
     return;
 }
 
@@ -199,6 +197,7 @@ void execute_simulation(FILE *file) {
   for (int i = 0; i < global_simulation_state.world_height; i++) {
     for (int j = 0; j < global_simulation_state.world_width; j++) {
       for (int k = 0; k < global_simulation_state.num_replications; k++) {
+        printf("Replikacia: %d \n", k);
         int new_x = i;
       	int new_y = j;
 
