@@ -216,6 +216,9 @@ void execute_simulation(FILE *file) {
         int new_x = i;
       	int new_y = j;
 
+        if(strcmp(global_simulation_state.world[i][j], OBSTACLE) == 0) {
+          continue;
+        }
         global_simulation_state.world[i][j] = WALKER;
 
         for (int step = 0; step < global_simulation_state.max_steps; step++) {
