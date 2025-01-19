@@ -47,68 +47,65 @@ simulation_state_t global_simulation_state = {
 
 
 void initialize_simulation() {
+    // If the global state says we're in the menu, skip
     if (global_simulation_state.in_menu) {
         printf("Sim State is in menu!\n");
         return;
     }
 
-    printf("[SERVER]Initializing simulation...\n");
+    printf("[SERVER] Initializing simulation...\n");
 
-    simulation_state_t state = global_simulation_state;
-    state.obstacles_count = (int)(state.world_width * state.world_height) * (0.2);
+    // We’re operating directly on the global struct
+    global_simulation_state.obstacles_count = (int)(
+        global_simulation_state.world_width * global_simulation_state.world_height * 0.2
+    );
 
-
-    state.world = malloc(state.world_height * sizeof(char**));
-    if (!state.world) {
+    // Allocate rows
+    global_simulation_state.world = malloc(global_simulation_state.world_height * sizeof(char**));
+    if (!global_simulation_state.world) {
         perror("malloc world");
         exit(EXIT_FAILURE);
     }
 
-    // Allocate each row
-    for (int i = 0; i < state.world_height; i++) {
-        state.world[i] = malloc(state.world_width * sizeof(char*));
-        if (!state.world[i]) {
+    for (int i = 0; i < global_simulation_state.world_height; i++) {
+        global_simulation_state.world[i] = malloc(global_simulation_state.world_width * sizeof(char*));
+        if (!global_simulation_state.world[i]) {
             perror("malloc world[i]");
-            // Ideally free everything done so far, then exit
             exit(EXIT_FAILURE);
         }
     }
 
-    // Fill each cell with either SPACE or CENTER_WORLD, etc.
-    for (int i = 0; i < state.world_height; i++) {
-        for (int j = 0; j < state.world_width; j++) {
-            if (i == state.world_height / 2 && j == state.world_width / 2) {
-                // Place the center in the middle cell
-                state.world[i][j] = CENTER_WORLD;
+    // Fill each cell
+    for (int i = 0; i < global_simulation_state.world_height; i++) {
+        for (int j = 0; j < global_simulation_state.world_width; j++) {
+            if (i == global_simulation_state.world_height / 2 && j == global_simulation_state.world_width / 2) {
+                global_simulation_state.world[i][j] = CENTER_WORLD;
             } else {
-                state.world[i][j] = SPACE;
+                global_simulation_state.world[i][j] = SPACE;
             }
         }
     }
 
+    // Now this call uses global_simulation_state.world, which is allocated properly
     print_world();
 
-    FILE *result_file = fopen(state.results_file, "w");
+    FILE *result_file = fopen(global_simulation_state.results_file, "w");
     if (!result_file) {
         fprintf(stderr, "Neuspesne otvorenie vysledkoveho suboru.\n");
         return;
     }
 
-    for (int i = 0; i < state.num_replications; ++i) {
-      perform_replication(result_file);
+    for (int i = 0; i < global_simulation_state.num_replications; i++) {
+        perform_replication(result_file);
     }
 
     fclose(result_file);
+
     printf("Vysledky ulozene do %s.\n", global_simulation_state.results_file);
     print_simulation_state();
-
-//    for (int i = 0; i < state.world_height; i++) {
-//    	free(state.world[i]);
-//	}
-//	free(state.world);
-
     return;
 }
+
 
 void reset_simulation() {
     initialize_simulation();
