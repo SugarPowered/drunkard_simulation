@@ -2,6 +2,19 @@
 
 #include "server.h"
 
+void send_menu_state(int client_socket) {
+    // In this simple protocol, we just tell the client we’re in the MENU state
+    // e.g. "INFO|MENU" with no further payload
+    const char *message = "INFO|MENU";
+
+    ssize_t bytes_written = write(client_socket, message, strlen(message));
+    if (bytes_written < 0) {
+        perror("Failed to send menu state to client");
+    } else {
+        printf("Menu state notification sent to client.\n");
+    }
+}
+
 /**
  * Helper: pick_random_port
  * Picks a random port in [min_port .. max_port].
@@ -139,7 +152,7 @@ void *handle_client(void *arg) {
     free(client_data);
 
     char buffer[BUFFER_SIZE];
-    const char *welcome_msg = "Vita vas simulacia nahodnej pochodzky.\n";
+    const char *welcome_msg = "INFO|MENU\n";
     write(client_socket, welcome_msg, strlen(welcome_msg));
 
     simulation_state_t *state = get_simulation_state();
@@ -153,7 +166,7 @@ void *handle_client(void *arg) {
             break;
         }
 
-        printf("Dorucene od klienta: %s\n", buffer);
+        printf("[CLIENT->SERVER]%s\n", buffer);
         process_client_input(buffer);
         char file_content[BUFF_DATA_SIZE] = {0};
         FILE *file = fopen(state->results_file, "r");

@@ -11,6 +11,29 @@
 
 #define BUFFER_SIZE 2048
 
+void handle_server_message(const char *msg) {
+    // Example message: "INFO|MENU"
+    char copy[BUFFER_SIZE];
+    strncpy(copy, msg, sizeof(copy));
+    copy[sizeof(copy) - 1] = '\0';
+
+    // First token might be "INFO"
+    char *token = strtok(copy, "|");
+    if (!token) return;
+
+    // Second token might be "MENU"
+    token = strtok(NULL, "|");
+    if (!token) return;
+
+    if (strcmp(token, "MENU") == 0) {
+        // Now call our local function to display the menu
+        display_menu();
+    } else {
+        printf("[SERVER->CLIENT]%s\n", msg);
+    }
+    // else if ... handle other states like ONGOING_SIM, FINISHED_SIM, etc.
+}
+
 // Prompts user (H)ost or (J)oin?
 static int ask_user_for_mode() {
     char choice;
@@ -31,13 +54,7 @@ void sim_loop(int socket_fd) {
             break;
         }
 
-        if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
-            printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
-            break;
-        }
-
-        printf("Nespracovana sprava zo servera: %s\n", buffer);
-        display_menu();
+        handle_server_message(buffer);
     }
 }
 
