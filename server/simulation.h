@@ -44,7 +44,7 @@ void print_simulation_state();
 void process_client_input_locally(const char *input);
 simulation_state_t *get_simulation_state();
 void print_world();
-void perform_replication(FILE *file);
+void execute_simulation(FILE *file);
 
 
 #endif //SIMULATION_H

@@ -83,7 +83,10 @@ void initialize_simulation() {
         }
     }
 
-    place_obstacle(&global_simulation_state);
+    if(global_simulation_state.has_obstacles) {
+      place_obstacle(&global_simulation_state);
+    }
+
     print_world();
 
     FILE *result_file = fopen(global_simulation_state.results_file, "w");
@@ -92,9 +95,7 @@ void initialize_simulation() {
         return;
     }
 
-    for (int i = 0; i < global_simulation_state.num_replications; i++) {
-        perform_replication(result_file);
-    }
+    execute_simulation(result_file);
 
     fclose(result_file);
 
@@ -177,6 +178,75 @@ void print_world() {
   	}
 }
 
-void perform_replication(FILE *file) {
+int choose_direction(const double probabilities[], int size) {
+  double random_number = ((double) rand() / (double) RAND_MAX);
+  double cumulative = 0.0;
+  for (int i = 0; i < size; i++) {
+    cumulative += probabilities[i];
+    if (random_number < cumulative) {
+      return i;
+    }
+  }
+  return 0;
+}
 
+void execute_simulation(FILE *file) {
+  int new_position = 0;
+
+  int center_x = global_simulation_state.world_width / 2;
+  int center_y = global_simulation_state.world_height / 2;
+
+  for (int i = 0; i < global_simulation_state.world_height; i++) {
+    for (int j = 0; j < global_simulation_state.world_width; j++) {
+      for (int k = 0; k < global_simulation_state.num_replications; k++) {
+        int new_x = i;
+      	int new_y = j;
+
+        global_simulation_state.world[i][j] = WALKER;
+
+        for (int step = 0; step < global_simulation_state.max_steps; step++) {
+      		int direction = choose_direction(global_simulation_state.move_probabilities, 4);
+
+      		switch (direction) {
+        		case 0:
+					new_position = (new_y + 1) % global_simulation_state.world_height;
+                    if(strcmp(global_simulation_state.world[new_x][new_position],OBSTACLE) != 0) {
+                        global_simulation_state.world[new_x][new_y] = MOVE_UP;
+                        new_y = new_position;
+                    }
+          			break; //up
+        		case 1:
+                    new_position = (new_y - 1 + global_simulation_state.world_height) % global_simulation_state.world_height;
+					if(strcmp(global_simulation_state.world[new_x][new_position],OBSTACLE) != 0) {
+                        global_simulation_state.world[new_x][new_y] = MOVE_DOWN;
+                        new_y = new_position;
+					}
+          			break; //down
+        		case 2:
+                    new_position = (new_x + 1) % global_simulation_state.world_width;
+                    if(strcmp(global_simulation_state.world[new_position][new_y],OBSTACLE) != 0) {
+                        global_simulation_state.world[new_x][new_y] = MOVE_RIGHT;
+                        new_x = new_position;
+                    }
+          			break; // right
+        		case 3:
+                    new_position = (new_x - 1 + global_simulation_state.world_width) % global_simulation_state.world_width;
+                    if(strcmp(global_simulation_state.world[new_position][new_y],OBSTACLE) != 0) {
+                        global_simulation_state.world[new_x][new_y] = MOVE_LEFT;
+                        new_x = new_position;
+                    }
+          			break; //left
+            }
+
+            if(center_x == new_x && center_y == new_y) {
+              global_simulation_state.world[new_x][new_y] = WALKER;
+              print_world();
+              break;
+            }
+        }
+        global_simulation_state.world[new_x][new_y] = WALKER;
+        print_world();
+      }
+    }
+  }
 }
