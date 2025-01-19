@@ -83,6 +83,8 @@ void initialize_simulation() {
         }
     }
 
+    print_world();
+
     FILE *result_file = fopen(state.results_file, "w");
     if (!result_file) {
         fprintf(stderr, "Neuspesne otvorenie vysledkoveho suboru.\n");
@@ -165,11 +167,11 @@ simulation_state_t *get_simulation_state() {
 void print_world() {
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
-      	printf("%s", global_simulation_state.world[i][j]);
+      		printf("%s", global_simulation_state.world[i][j]);
     	}
   	}
 }
 
 void perform_replication(FILE *file) {
-	print_world();
+
 }
