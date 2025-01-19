@@ -152,7 +152,7 @@ void *handle_client(void *arg) {
     free(client_data);
 
     char buffer[BUFFER_SIZE];
-    const char *welcome_msg = "INFO|MENU\n";
+    const char *welcome_msg = "INFO|MENU";
     write(client_socket, welcome_msg, strlen(welcome_msg));
 
     simulation_state_t *state = get_simulation_state();
