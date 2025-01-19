@@ -167,13 +167,13 @@ simulation_state_t *get_simulation_state() {
 }
 
 void print_world() {
-  	printf("\n");
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
       		printf("%s", global_simulation_state.world[i][j]);
     	}
         printf("\n");
   	}
+    printf("\n");
 }
 
 int choose_direction(const double probabilities[], int size) {
@@ -196,6 +196,7 @@ void execute_simulation(FILE *file) {
 
   for (int i = 0; i < global_simulation_state.world_height; i++) {
     for (int j = 0; j < global_simulation_state.world_width; j++) {
+      printf("Vypocet pre policko: [%d,%d] \n", i,j);
       for (int k = 0; k < global_simulation_state.num_replications; k++) {
         printf("Replikacia: %d \n", k);
         int new_x = i;
