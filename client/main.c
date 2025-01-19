@@ -20,10 +20,12 @@ void handle_server_message(const char *msg) {
     // First token might be "INFO"
     char *token = strtok(copy, "|");
     if (!token) return;
+    printf("[TOKEN1]%s\n", token);
 
     // Second token might be "MENU"
     token = strtok(NULL, "|");
     if (!token) return;
+    printf("[TOKEN2]%s\n", token);
 
     if (strcmp(token, "MENU") == 0) {
         // Now call our local function to display the menu
