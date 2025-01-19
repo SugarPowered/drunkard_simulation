@@ -168,6 +168,9 @@ simulation_state_t *get_simulation_state() {
 void reset_world() {
   for (int i = 0; i < global_simulation_state.world_height; i++) {
         for (int j = 0; j < global_simulation_state.world_width; j++) {
+          	if (strcmp(global_simulation_state.world[i][j],OBSTACLE) == 0  ) {
+                  break;
+          	}
             if (i == global_simulation_state.world_height / 2 && j == global_simulation_state.world_width / 2) {
                 global_simulation_state.world[i][j] = CENTER_WORLD;
             } else {
