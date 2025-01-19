@@ -171,10 +171,12 @@ simulation_state_t *get_simulation_state() {
 }
 
 void print_world() {
+  	printf("\n");
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
       		printf("%s", global_simulation_state.world[i][j]);
     	}
+        printf("\n");
   	}
 }
 
