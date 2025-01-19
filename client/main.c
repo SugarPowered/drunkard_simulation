@@ -32,7 +32,8 @@ void sim_loop(int socket_fd) {
         }
 
         if (strncmp(buffer, "SIMULATION_COMPLETED:", 21) == 0) {
-            printf("PRISLI DATA O DOKONCENI SIMULACIE, SPRACUVAM DO SUBORU\n");
+            printf("Simulacia skoncena, priprava vizualizacie... \n");
+            run_renderer(socket_fd);
             break;
         }
 

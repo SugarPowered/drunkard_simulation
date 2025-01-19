@@ -37,7 +37,7 @@ void update_world_from_server(const char *data) {
 
     if (sscanf(data, "%d %d %c", &x, &y, &state) == 3) {
         if (x >= 0 && x < WORLD_SIZE && y >= 0 && y < WORLD_SIZE) {
-            world[x][y] = state;
+            world[x][y] = 'O';
         }
     }
 }

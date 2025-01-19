@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define MAX_STEPS 30
 
 simulation_state_t global_simulation_state = {
     .world_width = 0,
@@ -12,10 +13,38 @@ simulation_state_t global_simulation_state = {
     .num_replications = 0,
     .move_probabilities = {0},
     .max_steps = 0,
+    .has_obstacles = 0,
+    .obstacles_count = 0,
+    .is_interactive = 0,
     .results_file = "",
     .in_menu = true,
-    .interactive_mode = false
 };
+
+//void update_world(simulation_state_t *state) {
+//  if (state->is_interactive) {
+////    update_world_trajectory(state);
+//  } else {
+////    update_world_summary(state);
+//  }
+//}
+//
+//void place_obstacle(simulation_state_t *state) {
+//  int center_x = state->world_width / 2;
+//  int center_y = state->world_height / 2;
+//
+//  for (int i = 0; i < state->obstacles_count; i++) {
+//    int x, y;
+//
+//    do {
+//      x = rand() % state->world_width;
+//      y = rand() % state->world_height;
+//    } while ((x == center_x && y == center_y) || strcmp(state->world[x][y], OBSTACLE) == 0 || strcmp(state->world[x][y], WALKER) == 0);
+//    state->world[x][y] = OBSTACLE;
+//  }
+//
+//  update_world(state);
+//}
+
 
 void initialize_simulation() {
     if (global_simulation_state.in_menu) {
@@ -24,10 +53,33 @@ void initialize_simulation() {
     }
 
     simulation_state_t state = global_simulation_state;
+    state.obstacles_count = (int)(state.world_width * state.world_height) * (0.2);
 
-    for (int i = 0; i < MAX_WORLD_SIZE; ++i) {
-        for (int j = 0; j < MAX_WORLD_SIZE; ++j) {
-            state.obstacles[i][j] = false;
+    state.world = malloc(state.world_height * sizeof(char*));
+    if (state.world == NULL) {
+        perror("Failed to allocate memory for rows");
+        return;
+    }
+
+    for (int i = 0; i < state.world_height; i++) {
+        state.world[i] = malloc(state.world_width * sizeof(char));
+        if (state.world[i] == NULL) {
+            perror("Failed to allocate memory for a row");
+
+            for (int j = 0; j < i; j++) {
+                free(state.world[j]);
+            }
+            free(state.world);
+            return;
+        }
+    }
+
+    for (int i = 0; i < state.world_height; i++) {
+        for (int j = 0; j < state.world_width; j++) {
+            if (i == state.world_height/2 && j == state.world_width/2) {
+              state.world[i][j] = CENTER_WORLD;
+            }
+            state.world[i][j] = SPACE;
         }
     }
 
@@ -38,7 +90,7 @@ void initialize_simulation() {
     }
 
     for (int i = 0; i < state.num_replications; ++i) {
-      perform_replications(result_file);
+      perform_replication(result_file);
     }
 
     fclose(result_file);
@@ -54,7 +106,7 @@ void reset_simulation() {
 void print_simulation_state() {
     printf("Stav Simulacie:\n");
     printf("  V Menu: %s\n", global_simulation_state.in_menu ? "Ano" : "Nie");
-    printf("  Mod: %s\n", global_simulation_state.interactive_mode ? "Interaktivny" : "Sumarny");
+    printf("  Mod: %s\n", global_simulation_state.is_interactive ? "Interaktivny" : "Sumarny");
     printf("  Rozmery sveta: %dx%d\n", global_simulation_state.world_width, global_simulation_state.world_height);
     printf("  Max krokov: %d\n", global_simulation_state.max_steps);
     printf("  Pocet replikacii: %d\n", global_simulation_state.num_replications);
@@ -92,10 +144,15 @@ void process_client_input_locally(const char *input) {
     global_simulation_state.max_steps = atoi(token);
 
     token = strtok(NULL, delimiter);
+    global_simulation_state.has_obstacles = atoi(token);
+
+    token = strtok(NULL, delimiter);
+    global_simulation_state.is_interactive = atoi(token);
+
+    token = strtok(NULL, delimiter);
     snprintf(global_simulation_state.results_file, sizeof(global_simulation_state.results_file), "%s", token);
 
     global_simulation_state.in_menu = false;
-    global_simulation_state.interactive_mode = true;
 
     free(input_copy);
     initialize_simulation();
@@ -105,49 +162,14 @@ simulation_state_t *get_simulation_state() {
     return &global_simulation_state;
 }
 
-//void write_to_buffer(const char *data) {
-//    static size_t current_position = 0;
-//
-//    size_t data_length = strlen(data);
-//    if (current_position + data_length < BUFF_DATA_SIZE) {
-//        memcpy(&file_buff[current_position], data, data_length);
-//        current_position += data_length;
-//    } else {
-//        //fprintf(stderr, "Buffer overflow, data exceeds buffer size.\n");
-//    }
-//}
+void print_world() {
+  	for (int i = 0; i < global_simulation_state.world_height; i++) {
+    	for (int j = 0; j < global_simulation_state.world_width; j++) {
+      	printf("%s", global_simulation_state.world[i][j]);
+    	}
+  	}
+}
 
-void perform_replications(FILE *file) {
-  	static char buffer_data[BUFF_DATA_SIZE];
-
-    fprintf(file, "Výsledky replikácie:\n");
-//    write_to_buffer("Výsledky replikácie:\n");
-    for (int x = 0; x < global_simulation_state.world_width; ++x) {
-        for (int y = 0; y < global_simulation_state.world_height; ++y) {
-            if (global_simulation_state.obstacles[x][y]) continue;
-
-            fprintf(file, "Začiatok z (%d, %d):\n", x, y);
-            snprintf(buffer_data, sizeof(buffer_data), "Začiatok z (%d, %d):\n", x, y);
-//			write_to_buffer(buffer_data);
-
-            for (int i = 0; i < global_simulation_state.num_replications; ++i) {
-                int steps = 0;
-                int cx = x, cy = y;
-
-                while (steps < global_simulation_state.max_steps && !(cx == 0 && cy == 0)) {
-                    double rand_val = (double)rand() / RAND_MAX;
-                    if (rand_val < global_simulation_state.move_probabilities[0]) cy--;
-                    else if (rand_val < global_simulation_state.move_probabilities[0] + global_simulation_state.move_probabilities[1]) cy++;
-                    else if (rand_val < global_simulation_state.move_probabilities[0] + global_simulation_state.move_probabilities[1] + global_simulation_state.move_probabilities[2]) cx--;
-                    else cx++;
-
-                    steps++;
-                }
-
-                fprintf(file, "  Replikácia %d: krok %d \n", i + 1, steps);
-                snprintf(buffer_data, sizeof(buffer_data), "  Replikácia %d: krok %d \n", i + 1, steps);
-//				write_to_buffer(buffer_data);
-            }
-        }
-    }
+void perform_replication(FILE *file) {
+	print_world();
 }

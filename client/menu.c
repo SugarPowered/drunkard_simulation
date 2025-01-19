@@ -37,7 +37,7 @@ void print_ascii_menu_screen() {
 }
 
 void get_simulation_parameters() {
-    int world_width, world_height, replications, max_steps;
+    int world_width, world_height, replications, max_steps, has_obstacles, is_interactive;
     double probabilities[4], sum = 0.0;
     char output_file[100], buffer[1024];
 
@@ -61,13 +61,19 @@ void get_simulation_parameters() {
     printf("\nVloz maximalny pocet krokov (K): ");
     scanf("%d", &max_steps);
 
+    printf("\nChces svet s prekazkami? 1 - ano, 0 - nie");
+    scanf("%d", &has_obstacles);
+
+    printf("\nAky chces mod? 1 - interaktivny, 0 - sumarny");
+    scanf("%d", &is_interactive);
+
     printf("\nVloz nazov vystupneho suboru: ");
     scanf("%s", output_file);
 
-    snprintf(buffer, sizeof(buffer), "START_SIMULATION;%d;%d;%d;%.2f,%.2f,%.2f,%.2f;%d;%s",
+    snprintf(buffer, sizeof(buffer), "START_SIMULATION;%d;%d;%d;%.2f,%.2f,%.2f,%.2f;%d;%d;%d;%s",
              world_width, world_height, replications,
              probabilities[0], probabilities[1], probabilities[2], probabilities[3],
-             max_steps, output_file);
+             max_steps, has_obstacles,is_interactive, output_file);
 
     send_to_server(buffer);
 
