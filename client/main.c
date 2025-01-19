@@ -36,7 +36,7 @@ void handle_server_message(const char *msg) {
 // Prompts user (H)ost or (J)oin?
 static int ask_user_for_mode() {
     char choice;
-    printf("\nWould you like to host a new server (H) or join an existing server (J)?");
+    printf("\nWould you like to host a new server (H) or join an existing server (J)?: ");
     scanf(" %c", &choice);
     if (choice == 'H' || choice == 'h') return 1;
     return 0;

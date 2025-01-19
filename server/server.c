@@ -168,6 +168,7 @@ void *handle_client(void *arg) {
 
         printf("[CLIENT->SERVER]%s\n", buffer);
         process_client_input(buffer);
+
         char file_content[BUFF_DATA_SIZE] = {0};
         FILE *file = fopen(state->results_file, "r");
         if (file) {
@@ -175,8 +176,6 @@ void *handle_client(void *arg) {
             file_content[bytes_read] = '\0';
             fclose(file);
         }
-
-        process_client_input(buffer);
 
         char response[1024];
         snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
