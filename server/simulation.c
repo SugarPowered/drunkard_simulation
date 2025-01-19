@@ -250,9 +250,6 @@ void execute_simulation(FILE *file) {
             }
 
             if(center_x == new_x && center_y == new_y) {
-              global_simulation_state.world[new_x][new_y] = WALKER;
-              print_world();
-              reset_world();
               break;
             }
         }
