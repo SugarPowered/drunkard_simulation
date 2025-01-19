@@ -52,6 +52,8 @@ void initialize_simulation() {
         return;
     }
 
+    printf("[SERVER]Initializing simulation...\n");
+
     simulation_state_t state = global_simulation_state;
     state.obstacles_count = (int)(state.world_width * state.world_height) * (0.2);
 
