@@ -57,17 +57,32 @@ void initialize_simulation() {
     simulation_state_t state = global_simulation_state;
     state.obstacles_count = (int)(state.world_width * state.world_height) * (0.2);
 
-    state.world = malloc(state.world_height * sizeof(char**));
-	for (int i = 0; i < state.world_height; i++) {
-    	state.world[i] = malloc(state.world_width * sizeof(char*));
-	}
 
+    state.world = malloc(state.world_height * sizeof(char**));
+    if (!state.world) {
+        perror("malloc world");
+        exit(EXIT_FAILURE);
+    }
+
+    // Allocate each row
+    for (int i = 0; i < state.world_height; i++) {
+        state.world[i] = malloc(state.world_width * sizeof(char*));
+        if (!state.world[i]) {
+            perror("malloc world[i]");
+            // Ideally free everything done so far, then exit
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Fill each cell with either SPACE or CENTER_WORLD, etc.
     for (int i = 0; i < state.world_height; i++) {
         for (int j = 0; j < state.world_width; j++) {
-            if (i == state.world_height/2 && j == state.world_width/2) {
-              state.world[i][j] = CENTER_WORLD;
+            if (i == state.world_height / 2 && j == state.world_width / 2) {
+                // Place the center in the middle cell
+                state.world[i][j] = CENTER_WORLD;
+            } else {
+                state.world[i][j] = SPACE;
             }
-            state.world[i][j] = SPACE;
         }
     }
 
