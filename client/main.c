@@ -36,9 +36,9 @@ void handle_server_message(const char *msg) {
         if (!token) return;
 
         //run_renderer(msg)
-        printf("Zacinam renderovanie simulacie...");
+        printf("Zacinam renderovanie simulacie...\n");
     } else {
-        printf("[SERVER->CLIENT] %s\n", msg);
+        //printf("[SERVER->CLIENT] %s\n", msg);
     }
 }
 

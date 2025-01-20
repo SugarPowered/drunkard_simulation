@@ -280,7 +280,7 @@ void execute_simulation(FILE *file, int client_socket) {
             }
 
             int written = snprintf(buffer + buffer_offset, sizeof(buffer) - buffer_offset,
-                                           "%d %d %c\n", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
+                                           "%d %d %s\n", new_x, new_y, global_simulation_state.world[new_x][new_y]);
 			if (written > 0) {
                 buffer_offset += written;
             }
