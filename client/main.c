@@ -9,66 +9,85 @@
 #include "client.h"
 #include "menu.h"
 
+// ...
 #define BUFFER_SIZE 2048
 
-void handle_server_message(const char *msg) {
-    // Example message: "INFO|MENU"
+void handle_server_message(const char *msg, int socket_fd) {
+    // msg might be something like: "INFO|WORLD|3|3\n"
     char copy[BUFFER_SIZE];
     strncpy(copy, msg, sizeof(copy));
     copy[sizeof(copy) - 1] = '\0';
 
-    // First token might be "INFO"
+    // Let's parse the first token "INFO"
     char *token = strtok(copy, "|");
     if (!token) return;
 
     if (strcmp(token, "INFO") == 0) {
-        token = strtok(NULL, "|");
+        token = strtok(NULL, "|"); // next token: "WORLD" or "MENU" or ...
         if (!token) return;
 
         if (strcmp(token, "MENU") == 0) {
             display_menu();
-        } else {
+        }
+        else if (strcmp(token, "WORLD") == 0) {
+            // Next tokens: "H"|"W"
+            char *height_str = strtok(NULL, "|");
+            char *width_str  = strtok(NULL, "\n"); // or "|"
+            if (!height_str || !width_str) return;
+
+            int h = atoi(height_str);
+            int w = atoi(width_str);
+
+            // Now read h lines from the socket, each with w tokens
+            char **lines = malloc(sizeof(char*) * h);
+            for (int i = 0; i < h; i++) {
+                lines[i] = calloc(1, BUFFER_SIZE);
+                int bytes_read = read(socket_fd, lines[i], BUFFER_SIZE-1);
+                if (bytes_read <= 0) {
+                    printf("Server disconnected or error reading row.\n");
+                    break;
+                }
+                lines[i][bytes_read] = '\0';
+            }
+
+            // parse them into the global array
+            update_world_entire(h, w, lines);
+
+            // now render
+            render_world();
+
+            // free lines
+            for (int i = 0; i < h; i++) {
+                free(lines[i]);
+            }
+            free(lines);
+        }
+        else {
+            // Some other INFO message
             printf("[SERVER->CLIENT] %s\n", msg);
         }
-    } else if (strcmp(token, "SIM_UPDATE") == 0) {
-        // Second token: "<simulation_data>"
-        token = strtok(NULL, "|");
-        if (!token) return;
-
-        printf("[CLIENT->SEVER] Prijal som data replikacie, updatujem svet...\n");
-        printf("[CLIENT-TOKEN]%s", token);
-        update_world_from_server(token);
-        render_world();
-    } else {
-        //printf("[SERVER->CLIENT] %s\n", msg);
     }
-}
-
-// Prompts user (H)ost or (J)oin?
-static int ask_user_for_mode() {
-    char choice;
-    printf("\nWould you like to host a new server (H) or join an existing server (J)?: ");
-    scanf(" %c", &choice);
-    if (choice == 'H' || choice == 'h') return 1;
-    return 0;
+    else {
+        // Some other prefix, e.g. "SIM_UPDATE"
+        // If you keep partial updates, parse them here...
+    }
 }
 
 void sim_loop(int socket_fd) {
     char buffer[BUFFER_SIZE];
 
-    clear_world(); // Initialize the world state
+    clear_world(); // Initialize local world
     render_world();
 
     while (1) {
         memset(buffer, 0, sizeof(buffer));
-
         int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
         if (bytes_received <= 0) {
             printf("Server disconnected or error.\n");
             break;
         }
 
-        handle_server_message(buffer);
+        handle_server_message(buffer, socket_fd);
     }
 }
 
