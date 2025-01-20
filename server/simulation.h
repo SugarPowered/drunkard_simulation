@@ -36,7 +36,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
-static char buff[1024];
+static char buff[BUFF_DATA_SIZE];
 
 // void place_obstacle(simulation_state_t *state);
 void initialize_simulation();
@@ -46,6 +46,5 @@ void process_client_input_locally(const char *input);
 simulation_state_t *get_simulation_state();
 void print_world();
 void execute_simulation(FILE *file);
-
 
 #endif //SIMULATION_H

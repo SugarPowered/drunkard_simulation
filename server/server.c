@@ -177,13 +177,13 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-        const char *response;
-        snprintf(response, sizeof(response), "SIM_UPDATE|%s", buff);
-        printf("Chystam sa dorucit klientovi: %s\n", response);
+        char response[BUFFER_SIZE];
+		snprintf(response, sizeof(response), "SIM_UPDATE|%s", file_content);
+		printf("Chystam sa dorucit klientovi: %s\n", response);
 
-        int check = write(client_socket, response, strlen(response));
-        printf("Check poslanych bytov: %d\n", check);
-        break;
+		int check = write(client_socket, response, strlen(response));
+		printf("Check poslanych bytov: %d\n", check);
+		break;
     }
 
  	close(client_socket);

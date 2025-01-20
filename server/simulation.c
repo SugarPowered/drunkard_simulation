@@ -185,11 +185,11 @@ void reset_world() {
 void print_world() {
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
-//      		printf("%s", global_simulation_state.world[i][j]);
+      		printf("%s", global_simulation_state.world[i][j]);
     	}
-//        printf("\n");
+        printf("\n");
   	}
-//    printf("\n");
+    printf("\n");
 }
 
 int choose_direction(const double probabilities[], int size) {
@@ -205,7 +205,7 @@ int choose_direction(const double probabilities[], int size) {
 }
 
 //void write_to_buffer(const char *data) {
-//    if (strlen(data) + 1 < BUFF_DATA_SIZE) {
+//    if (strlen(buff) + strlen(data) + 1 < BUFF_DATA_SIZE) {
 //        strcat(buff, data);
 //        strcat(buff, "\n"); // Adding a newline for each entry
 //    } else {
