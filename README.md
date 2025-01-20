@@ -11,10 +11,17 @@ this project simulates the movement of a drunk pedestrian in a 2d world using a 
 - basic knowledge of socket programming. 💻
 
 ## how to use? 🛠️
-1. navigate to the `server` directory and compile the server: 🔧
-2. start the server: 🚀
-3. navigate to the `client` directory and compile the client: 🔄
-4. in another terminal, start the client: 💻
+1. in the main directory create a `build` directory and compile: 🔧
+````bash
+mkdir build
+cd build
+cmake ..
+make
+````
+2. start the client: 🚀
+````bash
+./rw_client
+````
 
 ## features ✨
 - create simulations with customizable parameters. ⚙️
