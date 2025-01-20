@@ -34,8 +34,6 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
     return bytes_received;
 }
 
-
-
 void close_connection() {
     if (client_socket >= 0) {
         printf("Zatvaram socket %d.\n", client_socket);

@@ -34,6 +34,9 @@ typedef struct {
     char results_file[256];
 
     char*** world;
+
+    double* average_probablity;
+    double* steps_count;
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;

@@ -55,6 +55,7 @@ void initialize_simulation(int client_socket) {
         perror("malloc world");
         exit(EXIT_FAILURE);
     }
+
     for (int i = 0; i < global_simulation_state.world_height; i++) {
         global_simulation_state.world[i] =
                 malloc(global_simulation_state.world_width * sizeof(char*));
@@ -73,6 +74,10 @@ void initialize_simulation(int client_socket) {
             }
         }
     }
+
+    int world_size = global_simulation_state.world_width * global_simulation_state.world_height;
+    global_simulation_state.average_probablity = calloc(world_size, sizeof(double));
+    global_simulation_state.steps_count = calloc(world_size, sizeof(double));
 
     if (global_simulation_state.has_obstacles) {
         place_obstacle(&global_simulation_state);
@@ -239,22 +244,24 @@ void execute_simulation(FILE *file, int client_socket) {
 
     for (int i = 0; i < global_simulation_state.world_height; i++) {
         for (int j = 0; j < global_simulation_state.world_width; j++) {
-            // if there's an obstacle, skip or handle differently
             if (strcmp(global_simulation_state.world[i][j], OBSTACLE) == 0) {
                 continue;
             }
 
             printf("[SERVER] Starting random walks at cell [%d, %d]\n", i, j);
 
+            int total_steps = 0;
+            int successful_reach = 0;
+
             for (int rep = 0; rep < global_simulation_state.num_replications; rep++) {
                 global_simulation_state.world[i][j] = WALKER;
 
                 int wx = i, wy = j;
+				int steps = 0;
 
-                for (int step = 0; step < global_simulation_state.max_steps; step++) {
+                for (steps = 0; steps < global_simulation_state.max_steps; steps++) {
                     int dir = choose_direction(global_simulation_state.move_probabilities, 4);
 
-                    // Attempt the move
                     switch (dir) {
                         case 0: { // up
                             int new_y = (wy + 1) % global_simulation_state.world_height;
@@ -293,8 +300,15 @@ void execute_simulation(FILE *file, int client_socket) {
                     }
 
                     if (wx == center_x && wy == center_y) {
+                      	if(!global_simulation_state.is_interactive) {
+                          successful_reach++;
+                      	}
                         break;
                     }
+                }
+
+                if (steps < global_simulation_state.max_steps) {
+                    total_steps += steps;
                 }
 
                 global_simulation_state.world[wx][wy] = WALKER;
@@ -306,6 +320,20 @@ void execute_simulation(FILE *file, int client_socket) {
 
                 reset_world();
             }
+
+            if (!global_simulation_state.is_interactive) {
+              int index = i * global_simulation_state.world_width + j;
+              if (successful_reach > 0) {
+               	global_simulation_state.average_probablity[index] = (double)successful_reach / global_simulation_state.num_replications;
+                global_simulation_state.steps_count[index] = (double)total_steps / successful_reach;
+              } else {
+                global_simulation_state.average_probablity[index] = 0.0;
+                global_simulation_state.steps_count[index] = -1.0;
+              }
+            }
         }
     }
+
+    free(global_simulation_state.average_probablity);
+    free(global_simulation_state.steps_count);
 }
