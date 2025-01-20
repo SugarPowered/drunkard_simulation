@@ -274,7 +274,7 @@ void execute_simulation(FILE *file, int client_socket) {
             }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
-        //print_world(); // => uncomm if want see simulation process printed
+        //print_world();
         reset_world();
 
         if (buffer_offset > 0) {

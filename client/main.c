@@ -46,7 +46,7 @@ void handle_server_message(const char *msg) {
 // Prompts user (H)ost or (J)oin?
 static int ask_user_for_mode() {
     char choice;
-    printf("\nWould you like to host a new server (H) or join an existing server (J)?: ");
+    printf("\nChcete vytvorit novy server (H) alebo sa pripojit k existujucemu serveru (J)?: ");
     scanf(" %c", &choice);
     if (choice == 'H' || choice == 'h') return 1;
     return 0;
@@ -63,7 +63,7 @@ void sim_loop(int socket_fd) {
 
         int bytes_received = receive_from_server(socket_fd, buffer, sizeof(buffer));
         if (bytes_received <= 0) {
-            printf("Server disconnected or error.\n");
+            printf("Server sa odpojil alebo doslo k chybe.\n");
             break;
         }
 
@@ -83,13 +83,13 @@ int main() {
         snprintf(pipe, sizeof(pipe),
                  "DRUNKARD_%d_SIM", rnd);
 
-        printf("Creating a new pipe %s\n", pipe);
+        printf("Vytvaram novy pipe %s\n", pipe);
 
         pipe_init(pipe);
 
         pid_t cpid = fork();
         if (cpid < 0) {
-            perror("Failed to fork server\n");
+            perror("Nepodarilo sa vytvorit fork server\n");
             pipe_destroy(pipe);
             return 1;
         }
@@ -102,15 +102,15 @@ int main() {
             _exit(0);
         }
         else {
-            printf("Starting client in 1 second...\n");
+            printf("Spustenie klienta za 1 sekundu...\n");
             sleep(1);
             int fd_read = pipe_open_read(pipe);
 
             if (read(fd_read, &chosen_port, sizeof(chosen_port)) == -1) {
-                fprintf(stderr, "ERROR: Did not receive ephemeral port from child.\n");
+                fprintf(stderr, "CHYBA: Nepodarilo sa prijimat efemerny port od dietata.\n");
                 exit(EXIT_FAILURE);
             }
-            printf("Parent got ephemeral port: %d\n", chosen_port);
+            printf("Rodic dostal efemerny port: %d\n", chosen_port);
 
             pipe_close(fd_read);
             pipe_destroy(pipe);
@@ -119,7 +119,7 @@ int main() {
 
             int socket_fd = connect_to_server("127.0.0.1", chosen_port);
             if (socket_fd < 0) {
-                fprintf(stderr, "ERROR: Could not connect to server on port %d.\n", chosen_port);
+                fprintf(stderr, "CHYBA: Nepodarilo sa pripojit k serveru na porte %d.\n", chosen_port);
                 return 1;
             }
             client_socket = socket_fd;
@@ -130,12 +130,12 @@ int main() {
         }
     }
     else {
-        printf("Enter the server port to connect: ");
+        printf("Zadajte port servera na pripojenie: ");
         scanf("%d", &chosen_port);
 
         int socket_fd = connect_to_server("127.0.0.1", chosen_port);
         if (socket_fd < 0) {
-            fprintf(stderr, "ERROR: Could not connect to server on port %d.\n", chosen_port);
+            fprintf(stderr, "CHYBA: Nepodarilo sa pripojit k serveru na porte %d.\n", chosen_port);
             return 1;
         }
         client_socket = socket_fd;
