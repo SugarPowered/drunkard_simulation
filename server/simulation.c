@@ -20,8 +20,6 @@ simulation_state_t global_simulation_state = {
     .in_menu = true,
 };
 
-//char buff[1024] = {0};
-
 //void update_world(simulation_state_t *state) {
 //  if (state->is_interactive) {
 ////    update_world_trajectory(state);
@@ -47,7 +45,7 @@ void place_obstacle(simulation_state_t *state) {
   //update_world(state);
 }
 
-void initialize_simulation() {
+void initialize_simulation(int client_socket) {
     if (global_simulation_state.in_menu) {
         printf("Sim State is in menu!\n");
         return;
@@ -94,7 +92,7 @@ void initialize_simulation() {
         return;
     }
 
-    execute_simulation(result_file);
+    execute_simulation(result_file, client_socket);
 
     fclose(result_file);
 
@@ -104,8 +102,8 @@ void initialize_simulation() {
 }
 
 
-void reset_simulation() {
-    initialize_simulation();
+void reset_simulation(int client_socket) {
+    initialize_simulation(client_socket);
 }
 
 void print_simulation_state() {
@@ -121,7 +119,7 @@ void print_simulation_state() {
     printf("  Subor vysledkov: %s\n", global_simulation_state.results_file);
 }
 
-void process_client_input_locally(const char *input) {
+void process_client_input_locally(const char *input, int client_socket) {
 	char *token;
     char *input_copy = calloc(strlen(input) + 1, sizeof(char));
     strcpy(input_copy, input);
@@ -160,7 +158,7 @@ void process_client_input_locally(const char *input) {
     global_simulation_state.in_menu = false;
 
     free(input_copy);
-    initialize_simulation();
+    initialize_simulation(client_socket);
 }
 
 simulation_state_t *get_simulation_state() {
@@ -213,12 +211,19 @@ int choose_direction(const double probabilities[], int size) {
 //    }
 //}
 
-void execute_simulation(FILE *file) {
-//  memset(buff, 0, sizeof(buff));
+void execute_simulation(FILE *file, int client_socket) {
+  char buffer[4096]; // Local buffer for sending data
+  memset(buffer, 0, sizeof(buffer));
+  size_t buffer_offset = 0;
+
   int new_position = 0;
 
   int center_x = global_simulation_state.world_width / 2;
   int center_y = global_simulation_state.world_height / 2;
+
+  const char *header = "SIM_UPDATE|";
+  size_t header_len = snprintf(buffer, sizeof(buffer), "%s", header);
+  buffer_offset += header_len;
 
   for (int i = 0; i < global_simulation_state.world_height; i++) {
     for (int j = 0; j < global_simulation_state.world_width; j++) {
@@ -271,9 +276,19 @@ void execute_simulation(FILE *file) {
               break;
             }
 
-//            char update[256];
-//            snprintf(update, sizeof(update), "%d %d %c", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
-//            write_to_buffer(update);
+            int written = snprintf(buffer + buffer_offset, sizeof(buffer) - buffer_offset,
+                                           "%d %d %c\n", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
+			if (written > 0) {
+                buffer_offset += written;
+
+                // Send buffer if nearly full
+                if (buffer_offset >= sizeof(buffer) -  64) {
+                    write(client_socket, buffer, buffer_offset);
+                    printf("posla som %zu bytov of dat\n", buffer_offset);
+                    memset(buffer, 0, sizeof(buffer));
+                    buffer_offset = 0;
+                }
+            }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
         print_world();
@@ -281,6 +296,8 @@ void execute_simulation(FILE *file) {
       }
     }
   }
-//  fprintf(file, "%s", buff);
-//  memset(buff, 0, sizeof(buff));
+
+  if (buffer_offset > 0) {
+        write(client_socket, buffer, buffer_offset);
+    }
 }

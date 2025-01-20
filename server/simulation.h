@@ -2,6 +2,7 @@
 #define SIMULATION_H
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define BUFF_DATA_SIZE 1003
 #define BUFFER_SIZE 1024
@@ -39,12 +40,12 @@ extern simulation_state_t global_simulation_state;
 static char buff[BUFF_DATA_SIZE];
 
 // void place_obstacle(simulation_state_t *state);
-void initialize_simulation();
-void reset_simulation();
+void initialize_simulation(int client_socket);
+void reset_simulation(int client_socket);
 void print_simulation_state();
-void process_client_input_locally(const char *input);
+void process_client_input_locally(const char *input, int client_socket);
 simulation_state_t *get_simulation_state();
 void print_world();
-void execute_simulation(FILE *file);
+void execute_simulation(FILE *file, int client_socket);
 
 #endif //SIMULATION_H

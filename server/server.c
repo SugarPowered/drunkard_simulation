@@ -87,7 +87,7 @@ int run_server_internally(int requested_port) {
     int server_socket = create_server_socket(requested_port, &final_port);
 
     // If you want your simulation logic started now:
-    initialize_simulation();
+    initialize_simulation(server_socket);
 
     // Then block, accepting clients:
     run_server(server_socket);
@@ -114,7 +114,7 @@ int run_server_internally_with_fifo(int requested_port, int fifo_fd) {
     close(fifo_fd); // done writing
 
     // Start the simulation if needed
-    initialize_simulation();
+    initialize_simulation(server_socket);
 
     run_server(server_socket);
 
@@ -134,13 +134,13 @@ void initialize_server(int requested_port) {
     run_server(server_socket);
 }
 
-void process_client_input(const char *input) {
+void process_client_input(const char *input, int client_socket) {
     if (strncmp(input, "START_SIMULATION", 16) == 0) {
         printf("Startuje sa nova simulacia...\n");
-        process_client_input_locally(input);
+        process_client_input_locally(input, client_socket);
     } else if (strncmp(input, "REPLAY_SIMULATION", 17) == 0) {
         printf("Opatovne spustenie predoslej simulacie...\n");
-        reset_simulation();
+        reset_simulation(client_socket);
     } else {
         printf("Neznamy prikaz: %s\n", input);
     }
@@ -167,7 +167,7 @@ void *handle_client(void *arg) {
         }
 
         printf("[CLIENT->SERVER] %s\n", buffer);
-        process_client_input(buffer);
+        process_client_input(buffer, client_socket);
 
         char file_content[BUFF_DATA_SIZE] = {0};
         FILE *file = fopen(global_simulation_state.results_file, "r");
@@ -177,12 +177,12 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-        char response[BUFFER_SIZE];
-		snprintf(response, sizeof(response), "SIM_UPDATE|%s", file_content);
-		printf("Chystam sa dorucit klientovi: %s\n", response);
-
-		int check = write(client_socket, response, strlen(response));
-		printf("Check poslanych bytov: %d\n", check);
+//        char response[BUFFER_SIZE];
+//		snprintf(response, sizeof(response), "SIM_UPDATE|%s", buffer);
+//		printf("Chystam sa dorucit klientovi: %s\n", response);
+//
+//		int check = write(client_socket, response, strlen(response));
+//		printf("Check poslanych bytov: %d\n", check);
 		break;
     }
 
