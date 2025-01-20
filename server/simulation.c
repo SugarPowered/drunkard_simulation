@@ -214,21 +214,24 @@ int choose_direction(const double probabilities[], int size) {
 void execute_simulation(FILE *file, int client_socket) {
   char buffer[4096]; // Local buffer for sending data
   memset(buffer, 0, sizeof(buffer));
-  size_t buffer_offset = 0;
+
 
   int new_position = 0;
 
   int center_x = global_simulation_state.world_width / 2;
   int center_y = global_simulation_state.world_height / 2;
 
-  const char *header = "SIM_UPDATE|";
-  size_t header_len = snprintf(buffer, sizeof(buffer), "%s", header);
-  buffer_offset += header_len;
+
 
   for (int i = 0; i < global_simulation_state.world_height; i++) {
     for (int j = 0; j < global_simulation_state.world_width; j++) {
       printf("Vypocet pre policko: [%d,%d] \n", i,j);
       for (int k = 0; k < global_simulation_state.num_replications; k++) {
+        size_t buffer_offset = 0;
+      	const char *header = "SIM_UPDATE|";
+  	    size_t header_len = snprintf(buffer, sizeof(buffer), "%s", header);
+        buffer_offset += header_len;
+
         printf("Replikacia: %d \n", k);
         int new_x = i;
       	int new_y = j;
@@ -280,24 +283,18 @@ void execute_simulation(FILE *file, int client_socket) {
                                            "%d %d %c\n", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
 			if (written > 0) {
                 buffer_offset += written;
-
-                // Send buffer if nearly full
-                if (buffer_offset >= sizeof(buffer) -  64) {
-                    write(client_socket, buffer, buffer_offset);
-                    printf("posla som %zu bytov of dat\n", buffer_offset);
-                    memset(buffer, 0, sizeof(buffer));
-                    buffer_offset = 0;
-                }
             }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
         print_world();
         reset_world();
+
+        if (buffer_offset > 0) {
+            write(client_socket, buffer, buffer_offset);
+            printf("Poslal som %zu bytov of dat\n", buffer_offset);
+            memset(buffer, 0, sizeof(buffer)); // Clear buffer
+        }
       }
     }
   }
-
-  if (buffer_offset > 0) {
-        write(client_socket, buffer, buffer_offset);
-    }
 }
