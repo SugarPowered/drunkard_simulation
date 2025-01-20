@@ -3,8 +3,6 @@
 #include "server.h"
 
 void send_menu_state(int client_socket) {
-    // In this simple protocol, we just tell the client we’re in the MENU state
-    // e.g. "INFO|MENU" with no further payload
     const char *message = "INFO|MENU";
 
     ssize_t bytes_written = write(client_socket, message, strlen(message));
@@ -15,36 +13,22 @@ void send_menu_state(int client_socket) {
     }
 }
 
-/**
- * Helper: pick_random_port
- * Picks a random port in [min_port .. max_port].
- */
 static int pick_random_port(int min_port, int max_port) {
     return min_port + rand() % (max_port - min_port + 1);
 }
 
-/**
- * create_server_socket:
- *    - If requested_port != 0, tries passive_socket_init(requested_port).
- *    - If requested_port == 0, picks random ports in [49152..65535] until it succeeds (or fails after N tries).
- *    - Returns the socket FD on success.
- *    - Stores the final port in *final_port_out.
- *    - Exits on fatal error.
- */
 static int create_server_socket(int requested_port, int *final_port_out) {
     if (!final_port_out) {
         fprintf(stderr, "create_server_socket called with NULL final_port_out!\n");
         exit(EXIT_FAILURE);
     }
 
-    // For safer random seeding, if you haven't seeded yet
     srand((unsigned)time(NULL));
 
     int server_socket = -1;
     int attempts = 100;
 
     if (requested_port != 0) {
-        // Try the user-specified port once
         server_socket = passive_socket_init(requested_port);
         if (server_socket < 0) {
             fprintf(stderr, "Failed to bind to port %d.\n", requested_port);
@@ -53,7 +37,6 @@ static int create_server_socket(int requested_port, int *final_port_out) {
         *final_port_out = requested_port;
         printf("create_server_socket: Bound to fixed port %d\n", requested_port);
     } else {
-        // Manual ephemeral approach: pick random from [49152..65535]
         const int min_port = 49152;
         const int max_port = 65535;
         while (attempts--) {
@@ -74,58 +57,39 @@ static int create_server_socket(int requested_port, int *final_port_out) {
     return server_socket;
 }
 
-/**
- * run_server_internally:
- *   - Creates/binds a server socket (random or fixed port).
- *   - Calls run_server(...) which typically loops forever.
- *   - Also calls initialize_simulation() first (if you want).
- */
 int run_server_internally(int requested_port) {
     simulation_state_t *state = get_simulation_state();
 
     int final_port = 0;
     int server_socket = create_server_socket(requested_port, &final_port);
 
-    // If you want your simulation logic started now:
     initialize_simulation(server_socket);
 
-    // Then block, accepting clients:
     run_server(server_socket);
 
-    return 0; // Typically never reached
+    return 0;
 }
 
-/**
- * run_server_internally_with_fifo:
- *   - Same as run_server_internally, but writes the chosen port to 'fifo_fd'
- *     so the *other side* knows which port was bound.
- */
 int run_server_internally_with_fifo(int requested_port, int fifo_fd) {
     simulation_state_t *state = get_simulation_state();
 
     int final_port = 0;
     int server_socket = create_server_socket(requested_port, &final_port);
 
-    // Write the final bound port to the FIFO/pipe
     if (write(fifo_fd, &final_port, sizeof(final_port)) == -1) {
         fprintf(stderr, "ERROR: could not write ephemeral port to FIFO.\n");
-        // handle or exit
     }
-    close(fifo_fd); // done writing
+    close(fifo_fd);
 
-    // Start the simulation if needed
     initialize_simulation(server_socket);
 
     run_server(server_socket);
 
-    return 0; // never reached
+    return 0;
 }
 
-/**
- * If you want to keep the old 'initialize_server' function for compatibility:
- */
+
 void initialize_server(int requested_port) {
-    // Old style: just create & bind, then call run_server
     int final_port = 0;
     int server_socket = create_server_socket(requested_port, &final_port);
 
@@ -177,12 +141,6 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-//        char response[BUFFER_SIZE];
-//		snprintf(response, sizeof(response), "SIM_UPDATE|%s", buffer);
-//		printf("Chystam sa dorucit klientovi: %s\n", response);
-//
-//		int check = write(client_socket, response, strlen(response));
-//		printf("Check poslanych bytov: %d\n", check);
 		break;
     }
 
@@ -218,7 +176,7 @@ void run_server(int server_socket) {
             close(client_socket);
             continue;
         }
-        // Detach so we don't wait on them
+
         pthread_detach(client_thread);
     }
 

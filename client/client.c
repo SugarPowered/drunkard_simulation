@@ -5,19 +5,6 @@
 #include "../sockets-lib/socket.h"
 #include "../server/server.h"
 
-// int initialize_connection() {
-//     if (client_socket != -1) {
-//         return client_socket;
-//     }
-//
-//     client_socket = connect_to_server(SERVER_ADDRESS, SERVER_PORT);
-//     if (client_socket < 0) {
-//         fprintf(stderr, "Zlyhalo pripojenie k serveru.\n");
-//         return -1;
-//     }
-//     printf("Uspesne pripojeny k socketu %d.\n", client_socket);
-//     return client_socket;
-// }
 int client_socket = -1;
 
 void send_to_server(const char *message) {

@@ -34,17 +34,12 @@ void render_world() {
     printf("\n");
 }
 
-/**
- * Example: if we parse "INFO|WORLD|H|W\n" then we read H lines,
- * each line has W tokens. We'll store them in global_simulation_state.world.
- */
 void update_world_entire(int height, int width, char **lines) {
     for (int i = 0; i < height; i++) {
         int col = 0;
         char *saveptr = NULL;
         char *token = strtok_r(lines[i], " \n", &saveptr);
         while (token && col < width) {
-            // Now we can safely do this, since world[i][col] is allocated
             global_simulation_state.world[i][col] = strdup(token);
             token = strtok_r(NULL, " \n", &saveptr);
             col++;
