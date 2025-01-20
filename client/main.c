@@ -9,6 +9,19 @@
 #include "client.h"
 #include "menu.h"
 
+#define BUFFER_SIZE 2048
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <time.h>
+#include "../server/server.h"
+#include "../sockets-lib/socket.h"
+#include "../pipe-lib/pipe.h"
+#include "client.h"
+#include "menu.h"
+
 // ...
 #define BUFFER_SIZE 2048
 
@@ -89,6 +102,15 @@ void sim_loop(int socket_fd) {
 
         handle_server_message(buffer, socket_fd);
     }
+}
+
+// Prompts user (H)ost or (J)oin?
+static int ask_user_for_mode() {
+    char choice;
+    printf("\nWould you like to host a new server (H) or join an existing server (J)?: ");
+    scanf(" %c", &choice);
+    if (choice == 'H' || choice == 'h') return 1;
+    return 0;
 }
 
 int main() {
