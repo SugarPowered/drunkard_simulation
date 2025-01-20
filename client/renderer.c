@@ -39,23 +39,19 @@ void render_world() {
  * each line has W tokens. We'll store them in global_simulation_state.world.
  */
 void update_world_entire(int height, int width, char **lines) {
-    // lines[0]..lines[height-1] each has W tokens
-    // parse them into global_simulation_state.world
-    // For each row i, split lines[i] by spaces, store in world[i][0..width-1].
     for (int i = 0; i < height; i++) {
         int col = 0;
         char *saveptr = NULL;
         char *token = strtok_r(lines[i], " \n", &saveptr);
         while (token && col < width) {
-            // We point world[i][col] at some static place or we copy the string
-            // But you already have an allocated array of char*
-            // So just do:
+            // Now we can safely do this, since world[i][col] is allocated
             global_simulation_state.world[i][col] = strdup(token);
             token = strtok_r(NULL, " \n", &saveptr);
             col++;
         }
     }
 }
+
 
 void update_world_from_server(const char *data) {
     // Old code was for partial steps. We'll skip that approach now.

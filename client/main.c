@@ -26,65 +26,85 @@
 #define BUFFER_SIZE 2048
 
 void handle_server_message(const char *msg, int socket_fd) {
-    // msg might be something like: "INFO|WORLD|3|3\n"
     char copy[BUFFER_SIZE];
     strncpy(copy, msg, sizeof(copy));
     copy[sizeof(copy) - 1] = '\0';
 
-    // Let's parse the first token "INFO"
     char *token = strtok(copy, "|");
     if (!token) return;
 
     if (strcmp(token, "INFO") == 0) {
-        token = strtok(NULL, "|"); // next token: "WORLD" or "MENU" or ...
+        token = strtok(NULL, "|");
         if (!token) return;
 
         if (strcmp(token, "MENU") == 0) {
             display_menu();
         }
         else if (strcmp(token, "WORLD") == 0) {
-            // Next tokens: "H"|"W"
+            // parse height & width
             char *height_str = strtok(NULL, "|");
-            char *width_str  = strtok(NULL, "\n"); // or "|"
+            char *width_str  = strtok(NULL, "\n");
             if (!height_str || !width_str) return;
 
             int h = atoi(height_str);
             int w = atoi(width_str);
 
-            // Now read h lines from the socket, each with w tokens
+            // 1) store them in global state
+            //    If world already allocated, free it first
+            if (global_simulation_state.world) {
+                // free previous data
+                for (int row = 0; row < global_simulation_state.world_height; row++) {
+                    free(global_simulation_state.world[row]);
+                }
+                free(global_simulation_state.world);
+                global_simulation_state.world = NULL;
+            }
+
+            global_simulation_state.world_height = h;
+            global_simulation_state.world_width  = w;
+
+            // 2) allocate
+            global_simulation_state.world = malloc(h * sizeof(char**));
+            for (int i = 0; i < h; i++) {
+                global_simulation_state.world[i] = malloc(w * sizeof(char*));
+                // Do not allocate the third level if you only store char pointers from strdup
+            }
+
+            // 3) read h lines from the socket
             char **lines = malloc(sizeof(char*) * h);
             for (int i = 0; i < h; i++) {
                 lines[i] = calloc(1, BUFFER_SIZE);
-                int bytes_read = read(socket_fd, lines[i], BUFFER_SIZE-1);
+                int bytes_read = read(socket_fd, lines[i], BUFFER_SIZE - 1);
                 if (bytes_read <= 0) {
                     printf("Server disconnected or error reading row.\n");
+                    // handle error or break
                     break;
                 }
                 lines[i][bytes_read] = '\0';
             }
 
-            // parse them into the global array
+            // 4) parse them into the local array
             update_world_entire(h, w, lines);
 
-            // now render
+            // 5) now we can render
             render_world();
 
-            // free lines
+            // 6) free lines
             for (int i = 0; i < h; i++) {
                 free(lines[i]);
             }
             free(lines);
         }
         else {
-            // Some other INFO message
+            // e.g. "INFO|something_else"
             printf("[SERVER->CLIENT] %s\n", msg);
         }
     }
     else {
-        // Some other prefix, e.g. "SIM_UPDATE"
-        // If you keep partial updates, parse them here...
+        // Possibly "SIM_UPDATE" or other states
     }
 }
+
 
 void sim_loop(int socket_fd) {
     char buffer[BUFFER_SIZE];
