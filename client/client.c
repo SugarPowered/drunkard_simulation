@@ -43,7 +43,7 @@ int receive_from_server(int socket_fd, char *buffer, int buffer_size) {
         return -1;
     }
 
-    printf("[SERVER->CLIENT]%s\n", buffer);
+//    printf("[SERVER->CLIENT]%s\n", buffer);
     return bytes_received;
 }
 

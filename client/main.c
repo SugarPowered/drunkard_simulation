@@ -35,8 +35,8 @@ void handle_server_message(const char *msg) {
         token = strtok(NULL, "|");
         if (!token) return;
 
-        //run_renderer(msg)
-        printf("Zacinam renderovanie simulacie...\n");
+        printf("Prijal som data replikacie, updatujem svet...\n");
+        //treba aby sa updatovali data po kazdom poslani dat z replikacie
     } else {
         //printf("[SERVER->CLIENT] %s\n", msg);
     }
