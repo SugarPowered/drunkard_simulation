@@ -5,6 +5,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "../server/simulation.h"
+
 void render_simulation(const char *simulation_state);
 void clear_world();
 void render_world();

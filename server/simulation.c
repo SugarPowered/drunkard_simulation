@@ -202,15 +202,6 @@ int choose_direction(const double probabilities[], int size) {
   return 0;
 }
 
-//void write_to_buffer(const char *data) {
-//    if (strlen(buff) + strlen(data) + 1 < BUFF_DATA_SIZE) {
-//        strcat(buff, data);
-//        strcat(buff, "\n"); // Adding a newline for each entry
-//    } else {
-//        fprintf(stderr, "Buffer overflow detected!\n");
-//    }
-//}
-
 void execute_simulation(FILE *file, int client_socket) {
   char buffer[4096]; // Local buffer for sending data
   memset(buffer, 0, sizeof(buffer));
@@ -291,7 +282,7 @@ void execute_simulation(FILE *file, int client_socket) {
 
         if (buffer_offset > 0) {
             write(client_socket, buffer, buffer_offset);
-            printf("Poslal som %zu bytov of dat\n", buffer_offset);
+            printf("SEVER->CLIENT] Poslal som %zu bytov of dat\n", buffer_offset);
             memset(buffer, 0, sizeof(buffer)); // Clear buffer
         }
       }

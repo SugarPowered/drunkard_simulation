@@ -35,8 +35,9 @@ void handle_server_message(const char *msg) {
         token = strtok(NULL, "|");
         if (!token) return;
 
-        printf("Prijal som data replikacie, updatujem svet...\n");
-        //treba aby sa updatovali data po kazdom poslani dat z replikacie
+        printf("[CLIENT->SEVER] Prijal som data replikacie, updatujem svet...\n");
+        update_world_from_server(token);
+        render_world();
     } else {
         //printf("[SERVER->CLIENT] %s\n", msg);
     }
@@ -53,6 +54,10 @@ static int ask_user_for_mode() {
 
 void sim_loop(int socket_fd) {
     char buffer[BUFFER_SIZE];
+
+    clear_world(); // Initialize the world state
+    render_world();
+
     while (1) {
         memset(buffer, 0, sizeof(buffer));
 
