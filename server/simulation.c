@@ -250,9 +250,8 @@ void execute_simulation(FILE *file, int client_socket) {
                 global_simulation_state.world[i][j] = WALKER;
 
                 int wx = i, wy = j;
-				int steps = 0;
 
-                for (steps = 0; steps < global_simulation_state.max_steps; steps++) {
+                for (int steps = 0; steps < global_simulation_state.max_steps; steps++) {
                     int dir = choose_direction(global_simulation_state.move_probabilities, 4);
 
                     switch (dir) {
@@ -293,15 +292,8 @@ void execute_simulation(FILE *file, int client_socket) {
                     }
 
                     if (wx == center_x && wy == center_y) {
-                      	if(!global_simulation_state.is_interactive) {
-                          successful_reach++;
-                      	}
                         break;
                     }
-                }
-
-                if (steps < global_simulation_state.max_steps) {
-                    total_steps += steps;
                 }
 
                 global_simulation_state.world[wx][wy] = WALKER;
@@ -315,7 +307,4 @@ void execute_simulation(FILE *file, int client_socket) {
             }
         }
     }
-
-    free(global_simulation_state.average_probablity);
-    free(global_simulation_state.steps_count);
 }
