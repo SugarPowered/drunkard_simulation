@@ -34,8 +34,7 @@ void handle_server_message(const char *msg) {
         // Second token: "<simulation_data>"
         token = strtok(NULL, "|");
         if (!token) return;
-
-        render_simulation(token); // Call render_simulation with the simulation data
+        printf("Zacinam renderovanie simulacie...");
     } else {
         printf("[SERVER->CLIENT] %s\n", msg);
     }
