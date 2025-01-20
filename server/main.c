@@ -8,7 +8,7 @@ int main() {
 
     initialize_server(0);
 
-    initialize_simulation();
+//    initialize_simulation();
     return 0;
 }
 
