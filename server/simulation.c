@@ -278,8 +278,4 @@ void execute_simulation(FILE *file) {
       }
     }
   }
-
-  if (file) {
-     fprintf(file, "%s", buff);
-  }
 }
