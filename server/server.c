@@ -166,7 +166,7 @@ void *handle_client(void *arg) {
             break;
         }
 
-        printf("[CLIENT->SERVER]%s\n", buffer);
+        printf("[CLIENT->SERVER] %s\n", buffer);
         process_client_input(buffer);
 
         char file_content[BUFF_DATA_SIZE] = {0};
@@ -177,8 +177,8 @@ void *handle_client(void *arg) {
             fclose(file);
         }
 
-        char response[1024];
-        snprintf(response, sizeof(response), "SIMULATION_COMPLETED:\n %s", file_buff);
+        const char *response;
+        snprintf(response, sizeof(response), "SIM_UPDATE|%s", buff);
         printf("Chystam sa dorucit klientovi: %s\n", response);
 
         int check = write(client_socket, response, strlen(response));

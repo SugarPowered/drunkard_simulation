@@ -21,15 +21,23 @@ void handle_server_message(const char *msg) {
     char *token = strtok(copy, "|");
     if (!token) return;
 
-    // Second token might be "MENU"
-    token = strtok(NULL, "|");
-    if (!token) return;
+    if (strcmp(token, "INFO") == 0) {
+        token = strtok(NULL, "|");
+        if (!token) return;
 
-    int comp_result = strcmp(token, "MENU");
-    if (comp_result == 0) {
-        display_menu();
+        if (strcmp(token, "MENU") == 0) {
+            display_menu();
+        } else {
+            printf("[SERVER->CLIENT] %s\n", msg);
+        }
+    } else if (strcmp(token, "SIM_UPDATE") == 0) {
+        // Second token: "<simulation_data>"
+        token = strtok(NULL, "|");
+        if (!token) return;
+
+        render_simulation(token); // Call render_simulation with the simulation data
     } else {
-        printf("[SERVER->CLIENT]%s\n", msg);
+        printf("[SERVER->CLIENT] %s\n", msg);
     }
 }
 

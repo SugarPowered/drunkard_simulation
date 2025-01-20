@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #define BUFF_DATA_SIZE 1003
+#define BUFFER_SIZE 1024
 
 #define MOVE_UP " ^^ "
 #define MOVE_DOWN " VV "
@@ -35,7 +36,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
-static char file_buff[2048] = {0};
+static char buff[BUFFER_SIZE] = {0};
 
 // void place_obstacle(simulation_state_t *state);
 void initialize_simulation();

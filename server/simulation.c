@@ -202,6 +202,15 @@ int choose_direction(const double probabilities[], int size) {
   return 0;
 }
 
+void write_to_buffer(const char *data) {
+    if (strlen(buff) + strlen(data) + 1 < BUFF_DATA_SIZE) {
+        strcat(buff, data);
+        strcat(buff, "\n"); // Adding a newline for each entry
+    } else {
+        fprintf(stderr, "Buffer overflow detected!\n");
+    }
+}
+
 void execute_simulation(FILE *file) {
   int new_position = 0;
 
@@ -258,11 +267,19 @@ void execute_simulation(FILE *file) {
             if(center_x == new_x && center_y == new_y) {
               break;
             }
+
+            char update[256];
+            snprintf(update, sizeof(update), "%d %d %c", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
+            write_to_buffer(update);
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
         print_world();
         reset_world();
       }
     }
+  }
+
+  if (file) {
+     fprintf(file, "%s", buff);
   }
 }
