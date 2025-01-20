@@ -282,4 +282,5 @@ void execute_simulation(FILE *file) {
     }
   }
   fprintf(file, "%s", buff);
+  memset(buff, 0, sizeof(buff));
 }
