@@ -203,37 +203,50 @@ int choose_direction(const double probabilities[], int size) {
     return size-1; // fallback
 }
 
-/**
- * Send the entire 2D world to the client, row by row.
- */
-void send_entire_world(int client_socket) {
-    // We'll do a multi-part message:
-    //   1) "INFO|WORLD|<height>|<width>\n"
-    //   2) Then <height> lines, each containing the cells separated by spaces.
-    char buffer[4096];
-
-    // 1) Header line
-    snprintf(buffer, sizeof(buffer),
-             "INFO|WORLD|%d|%d\n",
-             global_simulation_state.world_height,
-             global_simulation_state.world_width);
-    write(client_socket, buffer, strlen(buffer));
-
-    // 2) Each row
-    for (int i = 0; i < global_simulation_state.world_height; i++) {
-        memset(buffer, 0, sizeof(buffer));
-        for (int j = 0; j < global_simulation_state.world_width; j++) {
-            strncat(buffer, global_simulation_state.world[i][j],
-                    sizeof(buffer) - strlen(buffer) - 1);
-            strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        }
-        strncat(buffer, "\n", sizeof(buffer) - strlen(buffer) - 1);
-        write(client_socket, buffer, strlen(buffer));
+char* build_world_string(const simulation_state_t *state) {
+    int rows = state->world_height;
+    int cols = state->world_width;
+    if (rows <= 0 || cols <= 0) {
+        return strdup("WORLD_HEADER\n(empty world)\nEND_WORLD\n");
     }
 
-    // optional end marker
-    // write(client_socket, "INFO|WORLD_END\n", 16);
+    // Estimate maximum space needed
+    // Each cell up to 10 chars, plus header & footer lines
+    size_t max_size = (rows * cols * 10) + (rows * 2) + 200;
+    char *buffer = calloc(1, max_size);
+    if (!buffer) {
+        return NULL;
+    }
+
+    // Start with a known header line
+    strncat(buffer, "WORLD_HEADER\n", max_size - strlen(buffer) - 1);
+
+    // Build the multi-line representation
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            strncat(buffer, state->world[i][j], max_size - strlen(buffer) - 1);
+        }
+        strncat(buffer, "\n", max_size - strlen(buffer) - 1);
+    }
+
+    // Append a final terminator line
+    strncat(buffer, "END_WORLD\n", max_size - strlen(buffer) - 1);
+
+    return buffer; // Caller must free
 }
+
+
+void send_whole_world_to_client(int client_socket) {
+    char *worldText = build_world_string(&global_simulation_state);
+    if (!worldText) return; // handle error
+
+    if (client_socket >= 0) {
+        write(client_socket, worldText, strlen(worldText));
+    }
+
+    free(worldText);
+}
+
 
 void execute_simulation(FILE *file, int client_socket) {
     // We'll do a random walk for each cell, then send the entire 2D array to the client once
@@ -309,7 +322,7 @@ void execute_simulation(FILE *file, int client_socket) {
                 global_simulation_state.world[wx][wy] = WALKER;
 
                 // Send the entire world to the client so it can be rendered
-                send_entire_world(client_socket);
+                send_whole_world_to_client(client_socket);
 
                 // Also write results to file if you like
                 fprintf(file, "Replication %d from start[%d, %d] ended at [%d, %d]\n",
