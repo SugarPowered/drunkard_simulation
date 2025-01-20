@@ -206,13 +206,10 @@ void execute_simulation(FILE *file, int client_socket) {
   char buffer[4096]; // Local buffer for sending data
   memset(buffer, 0, sizeof(buffer));
 
-
   int new_position = 0;
 
   int center_x = global_simulation_state.world_width / 2;
   int center_y = global_simulation_state.world_height / 2;
-
-
 
   for (int i = 0; i < global_simulation_state.world_height; i++) {
     for (int j = 0; j < global_simulation_state.world_width; j++) {
@@ -277,7 +274,11 @@ void execute_simulation(FILE *file, int client_socket) {
             }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
+<<<<<<< HEAD
         //print_world();
+=======
+        //print_world(); // => uncomm if want see simulation process printed
+>>>>>>> 52dcf6b501c5366d9e300fafa3289f47786c8d74
         reset_world();
 
         if (buffer_offset > 0) {
