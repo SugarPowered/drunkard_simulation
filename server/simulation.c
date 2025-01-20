@@ -20,6 +20,8 @@ simulation_state_t global_simulation_state = {
     .in_menu = true,
 };
 
+char buff[1024] = {0};
+
 //void update_world(simulation_state_t *state) {
 //  if (state->is_interactive) {
 ////    update_world_trajectory(state);
@@ -183,11 +185,11 @@ void reset_world() {
 void print_world() {
   	for (int i = 0; i < global_simulation_state.world_height; i++) {
     	for (int j = 0; j < global_simulation_state.world_width; j++) {
-      		printf("%s", global_simulation_state.world[i][j]);
+//      		printf("%s", global_simulation_state.world[i][j]);
     	}
-        printf("\n");
+//        printf("\n");
   	}
-    printf("\n");
+//    printf("\n");
 }
 
 int choose_direction(const double probabilities[], int size) {

@@ -36,7 +36,7 @@ typedef struct {
 } simulation_state_t;
 
 extern simulation_state_t global_simulation_state;
-extern char buff[1024] = {0};
+extern char buff[1024];
 
 // void place_obstacle(simulation_state_t *state);
 void initialize_simulation();
