@@ -214,6 +214,7 @@ void write_to_buffer(const char *data) {
 }
 
 void execute_simulation(FILE *file) {
+  memset(buff, 0, sizeof(buff));
   int new_position = 0;
 
   int center_x = global_simulation_state.world_width / 2;
@@ -280,4 +281,5 @@ void execute_simulation(FILE *file) {
       }
     }
   }
+  fprintf(file, "%s", buff);
 }
