@@ -170,7 +170,7 @@ void *handle_client(void *arg) {
         process_client_input(buffer);
 
         char file_content[BUFF_DATA_SIZE] = {0};
-        FILE *file = fopen(state->results_file, "r");
+        FILE *file = fopen(global_simulation_state.results_file, "r");
         if (file) {
             size_t bytes_read = fread(file_content, sizeof(char), BUFF_DATA_SIZE - 1, file);
             file_content[bytes_read] = '\0';
