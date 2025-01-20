@@ -75,10 +75,6 @@ void initialize_simulation(int client_socket) {
         }
     }
 
-    int world_size = global_simulation_state.world_width * global_simulation_state.world_height;
-    global_simulation_state.average_probablity = calloc(world_size, sizeof(double));
-    global_simulation_state.steps_count = calloc(world_size, sizeof(double));
-
     if (global_simulation_state.has_obstacles) {
         place_obstacle(&global_simulation_state);
     }
@@ -250,9 +246,6 @@ void execute_simulation(FILE *file, int client_socket) {
 
             printf("[SERVER] Starting random walks at cell [%d, %d]\n", i, j);
 
-            int total_steps = 0;
-            int successful_reach = 0;
-
             for (int rep = 0; rep < global_simulation_state.num_replications; rep++) {
                 global_simulation_state.world[i][j] = WALKER;
 
@@ -319,17 +312,6 @@ void execute_simulation(FILE *file, int client_socket) {
                         rep+1, i, j, wx, wy);
 
                 reset_world();
-            }
-
-            if (!global_simulation_state.is_interactive) {
-              int index = i * global_simulation_state.world_width + j;
-              if (successful_reach > 0) {
-               	global_simulation_state.average_probablity[index] = (double)successful_reach / global_simulation_state.num_replications;
-                global_simulation_state.steps_count[index] = (double)total_steps / successful_reach;
-              } else {
-                global_simulation_state.average_probablity[index] = 0.0;
-                global_simulation_state.steps_count[index] = -1.0;
-              }
             }
         }
     }
