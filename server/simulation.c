@@ -244,7 +244,7 @@ void execute_simulation(FILE *file, int client_socket) {
                 continue;
             }
 
-            printf("[SERVER] Starting random walks at cell [%d, %d]\n", i, j);
+            //printf("[SERVER] Starting random walks at cell [%d, %d]\n", i, j);
 
             for (int rep = 0; rep < global_simulation_state.num_replications; rep++) {
                 global_simulation_state.world[i][j] = WALKER;
