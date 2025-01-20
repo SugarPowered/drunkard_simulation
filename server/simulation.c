@@ -205,7 +205,7 @@ int choose_direction(const double probabilities[], int size) {
 }
 
 void write_to_buffer(const char *data) {
-    if (strlen(buff) + strlen(data) + 1 < BUFF_DATA_SIZE) {
+    if (strlen(data) + 1 < BUFF_DATA_SIZE) {
         strcat(buff, data);
         strcat(buff, "\n"); // Adding a newline for each entry
     } else {
