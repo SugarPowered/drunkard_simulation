@@ -20,7 +20,7 @@ simulation_state_t global_simulation_state = {
     .in_menu = true,
 };
 
-char buff[1024] = {0};
+//char buff[1024] = {0};
 
 //void update_world(simulation_state_t *state) {
 //  if (state->is_interactive) {
@@ -204,17 +204,17 @@ int choose_direction(const double probabilities[], int size) {
   return 0;
 }
 
-void write_to_buffer(const char *data) {
-    if (strlen(data) + 1 < BUFF_DATA_SIZE) {
-        strcat(buff, data);
-        strcat(buff, "\n"); // Adding a newline for each entry
-    } else {
-        fprintf(stderr, "Buffer overflow detected!\n");
-    }
-}
+//void write_to_buffer(const char *data) {
+//    if (strlen(data) + 1 < BUFF_DATA_SIZE) {
+//        strcat(buff, data);
+//        strcat(buff, "\n"); // Adding a newline for each entry
+//    } else {
+//        fprintf(stderr, "Buffer overflow detected!\n");
+//    }
+//}
 
 void execute_simulation(FILE *file) {
-  memset(buff, 0, sizeof(buff));
+//  memset(buff, 0, sizeof(buff));
   int new_position = 0;
 
   int center_x = global_simulation_state.world_width / 2;
@@ -271,9 +271,9 @@ void execute_simulation(FILE *file) {
               break;
             }
 
-            char update[256];
-            snprintf(update, sizeof(update), "%d %d %c", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
-            write_to_buffer(update);
+//            char update[256];
+//            snprintf(update, sizeof(update), "%d %d %c", new_x, new_y, *global_simulation_state.world[new_x][new_y]);
+//            write_to_buffer(update);
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
         print_world();
@@ -281,6 +281,6 @@ void execute_simulation(FILE *file) {
       }
     }
   }
-  fprintf(file, "%s", buff);
-  memset(buff, 0, sizeof(buff));
+//  fprintf(file, "%s", buff);
+//  memset(buff, 0, sizeof(buff));
 }
