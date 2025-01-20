@@ -36,6 +36,7 @@ void handle_server_message(const char *msg) {
         if (!token) return;
 
         printf("[CLIENT->SEVER] Prijal som data replikacie, updatujem svet...\n");
+        printf("[CLIENT-TOKEN]%s", token);
         update_world_from_server(token);
         render_world();
     } else {

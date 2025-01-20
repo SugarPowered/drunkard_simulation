@@ -277,12 +277,12 @@ void execute_simulation(FILE *file, int client_socket) {
             }
         }
         global_simulation_state.world[new_x][new_y] = WALKER;
-        print_world();
+        //print_world();
         reset_world();
 
         if (buffer_offset > 0) {
             write(client_socket, buffer, buffer_offset);
-            printf("SEVER->CLIENT] Poslal som %zu bytov of dat\n", buffer_offset);
+            printf("[SERVER->CLIENT] Poslal som %zu bytov of dat\n", buffer_offset);
             memset(buffer, 0, sizeof(buffer)); // Clear buffer
         }
       }

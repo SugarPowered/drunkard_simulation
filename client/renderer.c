@@ -40,28 +40,9 @@ void update_world_from_server(const char *data) {
     char state[10];
 
     if (sscanf(data, "%d %d %s", &x, &y, state) == 3) {
+        printf("[CLIENT-X] %d [CLIENT-Y] %d [CLIENT-STATE] %s\n", x, y, state);
         if (x >= 0 && x < global_simulation_state.world_width && y >= 0 && y < global_simulation_state.world_height) {
             strncpy(global_simulation_state.world[x][y], state, sizeof(global_simulation_state.world[x][y]) - 1);
         }
     }
 }
-
-// NOT NEEDED SINCE LOGIC IS IN MAIN.C
-//void run_renderer(int client_socket) {
-//    char buffer[BUFFER_SIZE];
-//
-//    clear_world();
-//
-//    while (1) {
-//        memset(buffer, 0, BUFFER_SIZE);
-//        int bytes_received = read(client_socket, buffer, BUFFER_SIZE - 1);
-//        if (bytes_received <= 0) {
-//            printf("Odpojeny zo servera.\n");
-//            break;
-//        }
-//
-//        buffer[bytes_received] = '\0';
-//        update_world_from_server(buffer);
-//        render_world();
-//    }
-//}
